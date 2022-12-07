@@ -1,0 +1,15 @@
+name: 'Coverage actions'
+description: 'Comment coverage difference on PR and save current coverage to an endpoint'
+inputs:
+  token:
+    description: 'The token to access github'
+    required: false
+  pr_number:
+    description: 'The pull request number'
+    required: true
+  coverage:
+    description: 'The new (current branch) calculated coverage'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'

@@ -1,0 +1,34 @@
+{
+  "name": "coverage-actions",
+  "version": "0.0.1",
+  "description": "Comment coverage difference on PR and save current coverage to endpoint",
+  "main": "src/index.ts",
+  "scripts": {
+    "build": "npx tsc src/index.ts --outdir _js && ncc build _js/index.js -o dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RMEngels/coverage-actions.git"
+  },
+  "keywords": [
+    "code-coverage",
+    "coverage",
+    "phpunit",
+    "unittest"
+  ],
+  "author": "Ruben Engels <r.m.engels@scienta.nl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RMEngels/coverage-actions/issues"
+  },
+  "homepage": "https://github.com/RMEngels/coverage-actions#readme",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "@vercel/ncc": "^0.34.0",
+    "request": "^2.81.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  }
+}
