@@ -4,7 +4,7 @@
   "description": "Comment coverage difference on PR and save current coverage to endpoint",
   "main": "src/index.ts",
   "scripts": {
-    "build": "npx tsc src/index.ts --outdir _js && ncc build _js/index.js -o dist"
+    "build": "tsc src/index.ts --outdir _js --lib ESNext,dom && ncc build _js/index.js -o dist"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
     "@vercel/ncc": "^0.34.0",
+    "axios": "^1.2.1",
     "request": "^2.81.0"
   },
   "devDependencies": {
