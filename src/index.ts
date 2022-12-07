@@ -1,5 +1,12 @@
+import { ActionConfiguration } from "./config/ActionConfiguration";
+
 class CoverageActions {
-	constructor() {}
+	constructor(
+		private readonly config: ActionConfiguration
+	) {
+	}
 }
 
-export default new CoverageActions();
+export default new CoverageActions(
+	new ActionConfiguration(),
+);
