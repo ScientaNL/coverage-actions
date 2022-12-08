@@ -8,5 +8,5 @@ class CoverageActions {
 }
 
 export default new CoverageActions(
-	new ActionConfiguration(),
+	ActionConfiguration.loadConfiguration(),
 );

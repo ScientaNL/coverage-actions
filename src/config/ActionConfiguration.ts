@@ -3,22 +3,25 @@ import { getInput, setFailed } from "@actions/core";
 export type ActionType = "read" | "readAndSave" | "save";
 
 export class ActionConfiguration {
-	public readonly token: string;
-	public readonly pullRequest: number;
-	public readonly coverage: number;
-	public readonly actionType: ActionType;
-
-	constructor() {
-		this.token = getInput('token');
-		this.pullRequest = parseInt(getInput('pr_number'));
-		this.coverage = parseFloat(getInput('coverage'));
-		this.actionType = this.getInputActionType('action_type');
+	private constructor(
+		public readonly token: string,
+		public readonly pullRequest: number,
+		public readonly coverage: number,
+		public readonly actionType: ActionType,
+	) {
 	}
 
-	private getInputActionType(inputIdentifier: string): ActionType {
-		const actionInput = getInput(inputIdentifier);
+	public static loadConfiguration(): ActionConfiguration {
+		return new ActionConfiguration(
+			getInput('token'),
+			parseInt(getInput('pr_number')),
+			parseFloat(getInput('coverage')),
+			ActionConfiguration.verifyInputActionType(getInput('action_type')),
+		)
+	}
 
-		if (!this.isActionType(actionInput)){
+	private static verifyInputActionType(actionInput: string): ActionType {
+		if (!ActionConfiguration.isActionType(actionInput)){
 			const error =  new Error('The input is not part of the allowed input action types, the allowed types are, read, readAndSave and save');
 
 			setFailed(error);
@@ -28,7 +31,7 @@ export class ActionConfiguration {
 		return actionInput;
 	}
 
-	private isActionType(actionInput: string): actionInput is ActionType {
+	private static isActionType(actionInput: string): actionInput is ActionType {
 		return ["read", "readAndSave", "save"].includes(actionInput);
 	}
 }
