@@ -1,7 +1,7 @@
 import { setFailed } from "@actions/core";
-import { Adapter } from "../adapters/Adapter";
-import { DynamoDBAdapter } from "../adapters/DynamoDBAdapter";
-import { JsonblobAdapter } from "../adapters/JsonblobAdapter";
+import { Adapter } from "../Adapters/Adapter";
+import { DynamoDBAdapter } from "../Adapters/DynamoDBAdapter";
+import { JsonblobAdapter } from "../Adapters/JsonblobAdapter";
 
 export type AdapterType = "Jsonblob" | "DynamoDB";
 
