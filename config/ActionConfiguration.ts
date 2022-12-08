@@ -1,6 +1,8 @@
 import { getInput, setFailed } from "@actions/core";
+import { Adapter } from "../src/Adapters/Adapter";
+import { AdapterFactory } from "../src/Factory/AdapterFactory";
 
-export type ActionType = "read" | "readAndSave" | "save";
+export type ActionType = "read" | "save";
 
 export class ActionConfiguration {
 	private constructor(
@@ -8,6 +10,7 @@ export class ActionConfiguration {
 		public readonly pullRequest: number,
 		public readonly coverage: number,
 		public readonly actionType: ActionType,
+		public readonly storageAdapter: Adapter,
 	) {
 	}
 
@@ -17,7 +20,8 @@ export class ActionConfiguration {
 			parseInt(getInput('pr_number')),
 			parseFloat(getInput('coverage')),
 			ActionConfiguration.verifyInputActionType(getInput('action_type')),
-		)
+			AdapterFactory.createAdapter(getInput('storage_adapter')),
+		);
 	}
 
 	private static verifyInputActionType(actionInput: string): ActionType {

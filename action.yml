@@ -1,14 +1,20 @@
 name: 'Coverage actions'
 description: 'Comment coverage difference on PR and save current coverage to an endpoint'
 inputs:
+  action_type:
+    description: 'Read the coverage from remote and comment it on the pr or write a new coverage to a remote'
+    required: true
   token:
-    description: 'The token to access github'
+    description: 'The token to access github, only required on read'
     required: false
   pr_number:
     description: 'The pull request number'
     required: true
   coverage:
     description: 'The new (current branch) calculated coverage'
+    required: true
+  storage_adapter:
+    description: 'The storage adapter to use, available now are DynamoDB and Jsonblob'
     required: true
 runs:
   using: 'node16'
