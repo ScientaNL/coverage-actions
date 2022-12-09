@@ -15,7 +15,9 @@ jobs:
           action_type: "read"
           token: ${{ secrets.GITHUB_TOKEN }}
           pr_number: ${{ github.event.number }}
-          lines_coverage: "6.12"
-          method_coverage: "6.13"
-          class_coverage: "6.14"
+          repo: "coverage-actions"
+          owner: "ScientaNL"
+          lines_coverage: "6.10"
+          method_coverage: "5.90"
+          class_coverage: "6"
           storage_adapter: 'Jsonblob'

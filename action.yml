@@ -10,6 +10,12 @@ inputs:
   pr_number:
     description: 'The pull request number'
     required: true
+  repo:
+    description: 'The repository on which to execute'
+    required: true
+  owner:
+    description: 'The aforementioned repository owner'
+    required: true
   lines_coverage:
     description: 'The new (current branch) calculated lines coverage'
     required: true

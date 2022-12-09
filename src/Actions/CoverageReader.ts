@@ -22,6 +22,8 @@ export class CoverageReader implements Action {
 		const commentWriter = new CommentWriter(
 			this.config.pullRequest,
 			this.config.token,
+			this.config.repo,
+			this.config.owner,
 		);
 
 		await commentWriter.write(
