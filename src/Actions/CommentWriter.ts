@@ -36,7 +36,7 @@ export class CommentWriter {
 		});
 
 		for (const comment of Object.values(comments.data)) {
-			if (comment.body?.includes("Coverage report:")) {
+			if (comment.body?.includes("coverage:")) {
 				await this.update(
 					commentBody,
 					comment.id,
