@@ -1,0 +1,21 @@
+name: PR Test
+on:
+  pull_request:
+    types: [opened, reopened, synchronize]
+env:
+  JSONBLOB_ID: "1048215432397602816"
+jobs:
+  test-pr:
+    runs-on: ubuntu-latest
+    name: Test pr action
+    steps:
+      - name: Test Coverage
+        uses: ScientaNL/coverage-actions@develop
+        with:
+          action_type: "read"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          pr_number: ${{ github.event.number }}
+          lines_coverage: "6.12"
+          method_coverage: "6.13"
+          class_coverage: "6.14"
+          storage_adapter: 'Jsonblob'
