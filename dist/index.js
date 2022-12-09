@@ -11,17 +11,19 @@ exports.ActionConfiguration = void 0;
 var core_1 = __nccwpck_require__(42186);
 var AdapterFactory_1 = __nccwpck_require__(66638);
 var ActionConfiguration = /** @class */ (function () {
-    function ActionConfiguration(token, pullRequest, actionType, storageAdapter, linesCoverage, methodCoverage, classCoverage) {
+    function ActionConfiguration(token, pullRequest, actionType, storageAdapter, repo, owner, linesCoverage, methodCoverage, classCoverage) {
         this.token = token;
         this.pullRequest = pullRequest;
         this.actionType = actionType;
         this.storageAdapter = storageAdapter;
+        this.repo = repo;
+        this.owner = owner;
         this.linesCoverage = linesCoverage;
         this.methodCoverage = methodCoverage;
         this.classCoverage = classCoverage;
     }
     ActionConfiguration.loadConfiguration = function () {
-        return new ActionConfiguration((0, core_1.getInput)('token'), parseInt((0, core_1.getInput)('pr_number')), ActionConfiguration.verifyInputActionType((0, core_1.getInput)('action_type')), AdapterFactory_1.AdapterFactory.createAdapter((0, core_1.getInput)('storage_adapter')), parseFloat((0, core_1.getInput)('lines_coverage')), parseFloat((0, core_1.getInput)('method_coverage')), parseFloat((0, core_1.getInput)('class_coverage')));
+        return new ActionConfiguration((0, core_1.getInput)('token'), parseInt((0, core_1.getInput)('pr_number')), ActionConfiguration.verifyInputActionType((0, core_1.getInput)('action_type')), AdapterFactory_1.AdapterFactory.createAdapter((0, core_1.getInput)('storage_adapter')), (0, core_1.getInput)('repo'), (0, core_1.getInput)('owner'), parseFloat((0, core_1.getInput)('lines_coverage')), parseFloat((0, core_1.getInput)('method_coverage')), parseFloat((0, core_1.getInput)('class_coverage')));
     };
     ActionConfiguration.prototype.loadCoverage = function () {
         return {
@@ -60,6 +62,92 @@ var ExecutionStatus;
     ExecutionStatus["Failed"] = "FAILED";
     ExecutionStatus["Success"] = "SUCCESS";
 })(ExecutionStatus = exports.ExecutionStatus || (exports.ExecutionStatus = {}));
+
+
+/***/ }),
+
+/***/ 19857:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+exports.__esModule = true;
+exports.CommentFormatter = void 0;
+var CommentFormatter = /** @class */ (function () {
+    function CommentFormatter(coverageDiff, headCoverage, coverage) {
+        this.coverageDiff = coverageDiff;
+        this.headCoverage = headCoverage;
+        this.coverage = coverage;
+    }
+    CommentFormatter.prototype.writeCommentBody = function () {
+        var comment = this.heading();
+        comment += '<details>\n<summary>Coverage Report:</summary>\n\n';
+        comment += this.linesCoverage();
+        comment += this.methodCoverage();
+        comment += this.classCoverage();
+        comment += '</details>';
+        return comment;
+    };
+    CommentFormatter.prototype.heading = function () {
+        var heading = '```diff\n';
+        heading += (this.coverageDiff.linesDiff > 0) ? '+' : '-' + 'lines: from ' + this.headCoverage.linesCoverage + '% to ' + this.coverage.linesCoverage + '% (' + (this.coverageDiff.linesDiff > 0) ? '+' : 0;
+        heading += '```\n\n';
+        return heading;
+    };
+    CommentFormatter.prototype.linesCoverage = function () {
+        var linesCoverage = 'Lines coverage:\n```diff\n';
+        if (this.coverageDiff.linesDiff > 0) {
+            linesCoverage += '+ the line coverage has gone up by ' + this.coverageDiff.linesDiff.toFixed(2) + '%\n';
+            linesCoverage += '+ from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '%\n';
+        }
+        else if (this.coverageDiff.linesDiff === 0) {
+            linesCoverage += '! the lines coverage has stayed the same\n';
+            linesCoverage += '! the coverage is ' + this.coverage.linesCoverage + '%\n';
+        }
+        else {
+            linesCoverage += '- the line coverage has gone down by ' + this.coverageDiff.linesDiff.toFixed(2) + '%\n';
+            linesCoverage += '- from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '%\n';
+        }
+        linesCoverage += '```\n\n';
+        return linesCoverage;
+    };
+    CommentFormatter.prototype.methodCoverage = function () {
+        var methodCoverage = 'Method coverage:\n```diff\n';
+        if (this.coverageDiff.methodDiff > 0) {
+            methodCoverage += '+ the method coverage has gone up by ' + this.coverageDiff.methodDiff.toFixed(2) + '%\n';
+            methodCoverage += '+ from ' + this.headCoverage.methodCoverage.toFixed(2) + '% to ' + this.coverage.methodCoverage.toFixed(2) + '%\n';
+        }
+        else if (this.coverageDiff.methodDiff === 0) {
+            methodCoverage += '! the method coverage has stayed the same\n';
+            methodCoverage += '! the coverage is ' + this.coverage.methodCoverage + '%\n';
+        }
+        else {
+            methodCoverage += '- the method coverage has gone down by ' + this.coverageDiff.methodDiff.toFixed(2) + '%\n';
+            methodCoverage += '- from ' + this.headCoverage.methodCoverage.toFixed(2) + '% to ' + this.coverage.methodCoverage.toFixed(2) + '%\n';
+        }
+        methodCoverage += '```\n\n';
+        return methodCoverage;
+    };
+    CommentFormatter.prototype.classCoverage = function () {
+        var classCoverage = 'Class coverage:\n```diff\n';
+        if (this.coverageDiff.classDiff > 0) {
+            classCoverage += '+ the class coverage has gone up by ' + this.coverageDiff.classDiff.toFixed(2) + '%\n';
+            classCoverage += '+ from ' + this.headCoverage.classCoverage.toFixed(2) + '% to ' + this.coverage.classCoverage.toFixed(2) + '%\n';
+        }
+        else if (this.coverageDiff.classDiff === 0) {
+            classCoverage += '! the class coverage has stayed the same\n';
+            classCoverage += '! the coverage is ' + this.coverage.classCoverage + '%\n';
+        }
+        else {
+            classCoverage += '- the class coverage has gone down by ' + this.coverageDiff.classDiff.toFixed(2) + '%\n';
+            classCoverage += '- from ' + this.headCoverage.classCoverage.toFixed(2) + '% to ' + this.coverage.classCoverage.toFixed(2) + '%\n';
+        }
+        classCoverage += '```\n\n';
+        return classCoverage;
+    };
+    return CommentFormatter;
+}());
+exports.CommentFormatter = CommentFormatter;
 
 
 /***/ }),
@@ -108,23 +196,32 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 exports.CommentWriter = void 0;
 var github_1 = __nccwpck_require__(95438);
+var CommentFormatter_1 = __nccwpck_require__(19857);
 var CommentWriter = /** @class */ (function () {
-    function CommentWriter(pullRequest, token) {
+    function CommentWriter(pullRequest, token, repo, owner, coverageDiff, headCoverage, coverage) {
         this.pullRequest = pullRequest;
         this.token = token;
+        this.repo = repo;
+        this.owner = owner;
+        this.coverageDiff = coverageDiff;
+        this.headCoverage = headCoverage;
+        this.coverage = coverage;
         this.octokit = (0, github_1.getOctokit)(this.token);
+        this.commentFormatter = new CommentFormatter_1.CommentFormatter(this.coverageDiff, this.headCoverage, this.coverage);
     }
-    CommentWriter.prototype.write = function (coverageDiff, headCoverage, coverage) {
+    CommentWriter.prototype.write = function () {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var comments, _i, _b, comment;
+            var commentBody, comments, _i, _b, comment;
             return __generator(this, function (_c) {
                 switch (_c.label) {
-                    case 0: return [4 /*yield*/, this.octokit.rest.issues.listComments({
-                            owner: 'ScientaNL',
-                            repo: 'coverage-actions',
-                            issue_number: this.pullRequest
-                        })];
+                    case 0:
+                        commentBody = this.commentFormatter.writeCommentBody();
+                        return [4 /*yield*/, this.octokit.rest.issues.listComments({
+                                owner: this.owner,
+                                repo: this.repo,
+                                issue_number: this.pullRequest
+                            })];
                     case 1:
                         comments = _c.sent();
                         _i = 0, _b = Object.values(comments.data);
@@ -133,14 +230,14 @@ var CommentWriter = /** @class */ (function () {
                         if (!(_i < _b.length)) return [3 /*break*/, 5];
                         comment = _b[_i];
                         if (!((_a = comment.body) === null || _a === void 0 ? void 0 : _a.includes("Coverage report:"))) return [3 /*break*/, 4];
-                        return [4 /*yield*/, this.update(coverageDiff, headCoverage, coverage, comment.id)];
+                        return [4 /*yield*/, this.update(commentBody, comment.id)];
                     case 3:
                         _c.sent();
                         return [2 /*return*/];
                     case 4:
                         _i++;
                         return [3 /*break*/, 2];
-                    case 5: return [4 /*yield*/, this.create(coverageDiff, headCoverage, coverage)];
+                    case 5: return [4 /*yield*/, this.create(commentBody)];
                     case 6:
                         _c.sent();
                         return [2 /*return*/];
@@ -148,61 +245,18 @@ var CommentWriter = /** @class */ (function () {
             });
         });
     };
-    CommentWriter.prototype.create = function (coverageDiff, headCoverage, coverage) {
+    CommentWriter.prototype.create = function (comment) {
         return __awaiter(this, void 0, void 0, function () {
-            var comment;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        comment = 'Coverage report:\n\n Lines coverage:\n```diff\n';
-                        if (coverageDiff.linesDiff > 0) {
-                            comment += '+ the line coverage has gone up by ' + coverageDiff.linesDiff.toFixed(2) + '%\n';
-                            comment += '+ from ' + headCoverage.linesCoverage.toFixed(2) + '% to ' + coverage.linesCoverage.toFixed(2) + '%\n';
-                        }
-                        else if (coverageDiff.linesDiff === 0) {
-                            comment += '! the lines coverage has stayed the same\n';
-                            comment += '! the coverage is ' + coverage.linesCoverage + '%\n';
-                        }
-                        else {
-                            comment += '- the line coverage has gone down by ' + coverageDiff.linesDiff.toFixed(2) + '%\n';
-                            comment += '- from ' + headCoverage.linesCoverage.toFixed(2) + '% to ' + coverage.linesCoverage.toFixed(2) + '%\n';
-                        }
-                        comment += '```\n\n';
-                        comment += 'Method coverage:\n```diff\n';
-                        if (coverageDiff.methodDiff > 0) {
-                            comment += '+ the method coverage has gone up by ' + coverageDiff.methodDiff.toFixed(2) + '%\n';
-                            comment += '+ from ' + headCoverage.methodCoverage.toFixed(2) + '% to ' + coverage.methodCoverage.toFixed(2) + '%\n';
-                        }
-                        else if (coverageDiff.methodDiff === 0) {
-                            comment += '! the method coverage has stayed the same\n';
-                            comment += '! the coverage is ' + coverage.methodCoverage + '%\n';
-                        }
-                        else {
-                            comment += '- the method coverage has gone down by ' + coverageDiff.methodDiff.toFixed(2) + '%\n';
-                            comment += '- from ' + headCoverage.methodCoverage.toFixed(2) + '% to ' + coverage.methodCoverage.toFixed(2) + '%\n';
-                        }
-                        comment += '```\n\n';
-                        comment += 'Class coverage:\n```diff\n';
-                        if (coverageDiff.classDiff > 0) {
-                            comment += '+ the class coverage has gone up by ' + coverageDiff.classDiff.toFixed(2) + '%\n';
-                            comment += '+ from ' + headCoverage.classCoverage.toFixed(2) + '% to ' + coverage.classCoverage.toFixed(2) + '%\n';
-                        }
-                        else if (coverageDiff.classDiff === 0) {
-                            comment += '! the class coverage has stayed the same\n';
-                            comment += '! the coverage is ' + coverage.classCoverage + '%\n';
-                        }
-                        else {
-                            comment += '- the class coverage has gone down by ' + coverageDiff.classDiff.toFixed(2) + '%\n';
-                            comment += '- from ' + headCoverage.classCoverage.toFixed(2) + '% to ' + coverage.classCoverage.toFixed(2) + '%\n';
-                        }
-                        comment += '```';
-                        // @ts-ignore
-                        return [4 /*yield*/, this.octokit.rest.issues.createComment({
-                                owner: 'ScientaNL',
-                                repo: 'coverage-actions',
-                                issue_number: this.pullRequest,
-                                body: comment
-                            })];
+                    case 0: 
+                    // @ts-ignore
+                    return [4 /*yield*/, this.octokit.rest.issues.createComment({
+                            owner: this.owner,
+                            repo: this.repo,
+                            issue_number: this.pullRequest,
+                            body: comment
+                        })];
                     case 1:
                         // @ts-ignore
                         _a.sent();
@@ -211,60 +265,16 @@ var CommentWriter = /** @class */ (function () {
             });
         });
     };
-    CommentWriter.prototype.update = function (coverageDiff, headCoverage, coverage, commentId) {
+    CommentWriter.prototype.update = function (comment, commentId) {
         return __awaiter(this, void 0, void 0, function () {
-            var comment;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        comment = 'Coverage report:\n\n Lines coverage:\n```diff\n';
-                        if (coverageDiff.linesDiff > 0) {
-                            comment += '+ the line coverage has gone up by ' + coverageDiff.linesDiff.toFixed(2) + '%\n';
-                            comment += '+ from ' + headCoverage.linesCoverage.toFixed(2) + '% to ' + coverage.linesCoverage.toFixed(2) + '%\n';
-                        }
-                        else if (coverageDiff.linesDiff === 0) {
-                            comment += '! the lines coverage has stayed the same\n';
-                            comment += '! the coverage is ' + coverage.linesCoverage + '%\n';
-                        }
-                        else {
-                            comment += '- the line coverage has gone down by ' + coverageDiff.linesDiff.toFixed(2) + '%\n';
-                            comment += '- from ' + headCoverage.linesCoverage.toFixed(2) + '% to ' + coverage.linesCoverage.toFixed(2) + '%\n';
-                        }
-                        comment += '```\n\n';
-                        comment += 'Method coverage:\n```diff\n';
-                        if (coverageDiff.methodDiff > 0) {
-                            comment += '+ the method coverage has gone up by ' + coverageDiff.methodDiff.toFixed(2) + '%\n';
-                            comment += '+ from ' + headCoverage.methodCoverage.toFixed(2) + '% to ' + coverage.methodCoverage.toFixed(2) + '%\n';
-                        }
-                        else if (coverageDiff.methodDiff === 0) {
-                            comment += '! the method coverage has stayed the same\n';
-                            comment += '! the coverage is ' + coverage.methodCoverage + '%\n';
-                        }
-                        else {
-                            comment += '- the method coverage has gone down by ' + coverageDiff.methodDiff.toFixed(2) + '%\n';
-                            comment += '- from ' + headCoverage.methodCoverage.toFixed(2) + '% to ' + coverage.methodCoverage.toFixed(2) + '%\n';
-                        }
-                        comment += '```\n\n';
-                        comment += 'Class coverage:\n```diff\n';
-                        if (coverageDiff.classDiff > 0) {
-                            comment += '+ the class coverage has gone up by ' + coverageDiff.classDiff.toFixed(2) + '%\n';
-                            comment += '+ from ' + headCoverage.classCoverage.toFixed(2) + '% to ' + coverage.classCoverage.toFixed(2) + '%\n';
-                        }
-                        else if (coverageDiff.classDiff === 0) {
-                            comment += '! the class coverage has stayed the same\n';
-                            comment += '! the coverage is ' + coverage.classCoverage + '%\n';
-                        }
-                        else {
-                            comment += '- the class coverage has gone down by ' + coverageDiff.classDiff.toFixed(2) + '%\n';
-                            comment += '- from ' + headCoverage.classCoverage.toFixed(2) + '% to ' + coverage.classCoverage.toFixed(2) + '%\n';
-                        }
-                        comment += '```';
-                        return [4 /*yield*/, this.octokit.rest.issues.updateComment({
-                                owner: 'ScientaNL',
-                                repo: 'coverage-actions',
-                                comment_id: commentId,
-                                body: comment
-                            })];
+                    case 0: return [4 /*yield*/, this.octokit.rest.issues.updateComment({
+                            owner: this.owner,
+                            repo: this.repo,
+                            comment_id: commentId,
+                            body: comment
+                        })];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -342,8 +352,8 @@ var CoverageReader = /** @class */ (function () {
                             classDiff: coverage.classCoverage - headCoverage.classCoverage,
                             methodDiff: coverage.methodCoverage - headCoverage.methodCoverage
                         };
-                        commentWriter = new CommentWriter_1.CommentWriter(this.config.pullRequest, this.config.token);
-                        return [4 /*yield*/, commentWriter.write(coverageDiff, headCoverage, coverage)];
+                        commentWriter = new CommentWriter_1.CommentWriter(this.config.pullRequest, this.config.token, this.config.repo, this.config.owner, coverageDiff, headCoverage, coverage);
+                        return [4 /*yield*/, commentWriter.write()];
                     case 2:
                         _a.sent();
                         return [2 /*return*/, Action_1.ExecutionStatus.Success];

@@ -24,13 +24,12 @@ export class CoverageReader implements Action {
 			this.config.token,
 			this.config.repo,
 			this.config.owner,
-		);
-
-		await commentWriter.write(
 			coverageDiff,
 			headCoverage,
-			coverage,
+			coverage
 		);
+
+		await commentWriter.write();
 
 		return ExecutionStatus.Success;
 	}
