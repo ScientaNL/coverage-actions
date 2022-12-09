@@ -8,6 +8,16 @@ export class CoverageWriter implements Action {
 	}
 
 	public async execute(): Promise<ExecutionStatus> {
+		try {
+			await this.config.storageAdapter.putCoverage({
+				linesCoverage: this.config.linesCoverage,
+				classCoverage: this.config.classCoverage,
+				methodCoverage: this.config.methodCoverage,
+			});
+		} catch (err) {
+			return ExecutionStatus.Failed;
+		}
+
 		return ExecutionStatus.Success;
 	}
 

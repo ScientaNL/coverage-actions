@@ -10,8 +10,14 @@ inputs:
   pr_number:
     description: 'The pull request number'
     required: true
-  coverage:
-    description: 'The new (current branch) calculated coverage'
+  lines_coverage:
+    description: 'The new (current branch) calculated lines coverage'
+    required: true
+  method_coverage:
+    description: 'The new (current branch) calculated method coverage'
+    required: true
+  class_coverage:
+    description: 'The new (current branch) calculated class coverage'
     required: true
   storage_adapter:
     description: 'The storage adapter to use, available now are DynamoDB and Jsonblob'
