@@ -1,4 +1,5 @@
 import { ActionConfiguration } from "../../config/ActionConfiguration";
+import { Coverage } from "../Adapters/Adapter";
 import { Action, ExecutionStatus } from "./Action";
 
 export class CoverageWriter implements Action {
@@ -8,11 +9,13 @@ export class CoverageWriter implements Action {
 	}
 
 	public async execute(): Promise<ExecutionStatus> {
+		const coverage: Coverage = this.config.loadCoverage();
+
 		try {
 			await this.config.storageAdapter.putCoverage({
-				linesCoverage: this.config.linesCoverage,
-				classCoverage: this.config.classCoverage,
-				methodCoverage: this.config.methodCoverage,
+				linesCoverage: coverage.linesCoverage,
+				classCoverage: coverage.classCoverage,
+				methodCoverage: coverage.methodCoverage,
 			});
 		} catch (err) {
 			return ExecutionStatus.Failed;

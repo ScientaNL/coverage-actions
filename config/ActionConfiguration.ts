@@ -1,5 +1,5 @@
 import { getInput, setFailed } from "@actions/core";
-import { Adapter } from "../src/Adapters/Adapter";
+import { Adapter, Coverage } from "../src/Adapters/Adapter";
 import { AdapterFactory } from "../src/Factory/AdapterFactory";
 
 export type ActionType = "read" | "save";
@@ -8,11 +8,11 @@ export class ActionConfiguration {
 	private constructor(
 		public readonly token: string,
 		public readonly pullRequest: number,
-		public readonly linesCoverage: number,
-		public readonly methodCoverage: number,
-		public readonly classCoverage: number,
 		public readonly actionType: ActionType,
 		public readonly storageAdapter: Adapter,
+		private readonly linesCoverage: number,
+		private readonly methodCoverage: number,
+		private readonly classCoverage: number,
 	) {
 	}
 
@@ -20,12 +20,20 @@ export class ActionConfiguration {
 		return new ActionConfiguration(
 			getInput('token'),
 			parseInt(getInput('pr_number')),
+			ActionConfiguration.verifyInputActionType(getInput('action_type')),
+			AdapterFactory.createAdapter(getInput('storage_adapter')),
 			parseFloat(getInput('lines_coverage')),
 			parseFloat(getInput('method_coverage')),
 			parseFloat(getInput('class_coverage')),
-			ActionConfiguration.verifyInputActionType(getInput('action_type')),
-			AdapterFactory.createAdapter(getInput('storage_adapter')),
 		);
+	}
+
+	public loadCoverage(): Coverage {
+		return {
+			linesCoverage: this.linesCoverage,
+			methodCoverage: this.methodCoverage,
+			classCoverage: this.classCoverage,
+		};
 	}
 
 	private static verifyInputActionType(actionInput: string): ActionType {

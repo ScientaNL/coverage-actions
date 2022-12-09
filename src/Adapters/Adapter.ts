@@ -4,6 +4,12 @@ export type Coverage = {
 	linesCoverage: number;
 }
 
+export type CoverageDiff = {
+	methodDiff: number;
+	classDiff: number;
+	linesDiff: number;
+}
+
 export interface Adapter {
 	pullCoverage(): Promise<Coverage>;
 
