@@ -17,3 +17,5 @@ Currently the available storage adapters are:
 A new adapter must implement the `Adapter` interface to insure compatibility with the current structure. 
 All credentials must be gotten through the environment.
 Dont forget to append to the `AdapterType` and `adapterMap`
+
+test pr test action
