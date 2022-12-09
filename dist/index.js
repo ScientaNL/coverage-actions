@@ -230,7 +230,7 @@ var CommentWriter = /** @class */ (function () {
                     case 2:
                         if (!(_i < _b.length)) return [3 /*break*/, 5];
                         comment = _b[_i];
-                        if (!((_a = comment.body) === null || _a === void 0 ? void 0 : _a.includes("Coverage report:"))) return [3 /*break*/, 4];
+                        if (!((_a = comment.body) === null || _a === void 0 ? void 0 : _a.includes("coverage:"))) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.update(commentBody, comment.id)];
                     case 3:
                         _c.sent();
