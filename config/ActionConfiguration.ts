@@ -8,7 +8,9 @@ export class ActionConfiguration {
 	private constructor(
 		public readonly token: string,
 		public readonly pullRequest: number,
-		public readonly coverage: number,
+		public readonly linesCoverage: number,
+		public readonly methodCoverage: number,
+		public readonly classCoverage: number,
 		public readonly actionType: ActionType,
 		public readonly storageAdapter: Adapter,
 	) {
@@ -18,7 +20,9 @@ export class ActionConfiguration {
 		return new ActionConfiguration(
 			getInput('token'),
 			parseInt(getInput('pr_number')),
-			parseFloat(getInput('coverage')),
+			parseFloat(getInput('lines_coverage')),
+			parseFloat(getInput('method_coverage')),
+			parseFloat(getInput('class_coverage')),
 			ActionConfiguration.verifyInputActionType(getInput('action_type')),
 			AdapterFactory.createAdapter(getInput('storage_adapter')),
 		);
@@ -26,7 +30,7 @@ export class ActionConfiguration {
 
 	private static verifyInputActionType(actionInput: string): ActionType {
 		if (!ActionConfiguration.isActionType(actionInput)){
-			const error =  new Error('The input is not part of the allowed input action types, the allowed types are, read, readAndSave and save');
+			const error =  new Error('The input is not part of the allowed input action types, the allowed types are, read and save');
 
 			setFailed(error);
 			throw error;
