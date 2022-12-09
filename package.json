@@ -4,7 +4,9 @@
   "description": "Comment coverage difference on PR and save current coverage to endpoint",
   "main": "src/index.ts",
   "scripts": {
-    "build": "tsc src/index.ts --outdir _js --lib ESNext,dom && ncc build _js/index.js -o dist"
+    "build": "tsc src/index.ts --outdir _js --lib ESNext,dom && ncc build _js/src/index.js -o dist",
+    "action": "act -b -W .test-workflows -C .",
+    "build-act": "npm run build && npm run action"
   },
   "repository": {
     "type": "git",
