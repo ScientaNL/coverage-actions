@@ -90,7 +90,8 @@ var CommentFormatter = /** @class */ (function () {
     };
     CommentFormatter.prototype.heading = function () {
         var heading = '```diff\n';
-        heading += (this.coverageDiff.linesDiff > 0) ? '+' : '-' + 'lines: from ' + this.headCoverage.linesCoverage + '% to ' + this.coverage.linesCoverage + '% (' + (this.coverageDiff.linesDiff > 0) ? '+' : 0;
+        // heading += (this.coverageDiff.linesDiff > 0) ? '+' : '-' + 'lines: from ' + this.headCoverage.linesCoverage + '% to ' + this.coverage.linesCoverage +'% (' + (this.coverageDiff.linesDiff > 0) ? '+' : '-' + this.coverageDiff.linesDiff + '%)\n';
+        heading += '- deze moet ik nog fixen huil huil\n';
         heading += '```\n\n';
         return heading;
     };
