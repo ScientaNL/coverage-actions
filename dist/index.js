@@ -145,6 +145,7 @@ var CommentFormatter = /** @class */ (function () {
         classCoverage += '```\n\n';
         return classCoverage;
     };
+    CommentFormatter.CommentIdentifier = "coverage:";
     return CommentFormatter;
 }());
 exports.CommentFormatter = CommentFormatter;
@@ -229,7 +230,7 @@ var CommentWriter = /** @class */ (function () {
                     case 2:
                         if (!(_i < _b.length)) return [3 /*break*/, 5];
                         comment = _b[_i];
-                        if (!((_a = comment.body) === null || _a === void 0 ? void 0 : _a.includes("coverage:"))) return [3 /*break*/, 4];
+                        if (!((_a = comment.body) === null || _a === void 0 ? void 0 : _a.includes(CommentFormatter_1.CommentFormatter.CommentIdentifier))) return [3 /*break*/, 4];
                         return [4 /*yield*/, this.update(commentBody, comment.id)];
                     case 3:
                         _c.sent();
@@ -249,16 +250,13 @@ var CommentWriter = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: 
-                    // @ts-ignore
-                    return [4 /*yield*/, this.octokit.rest.issues.createComment({
+                    case 0: return [4 /*yield*/, this.octokit.rest.issues.createComment({
                             owner: this.owner,
                             repo: this.repo,
                             issue_number: this.pullRequest,
                             body: comment
                         })];
                     case 1:
-                        // @ts-ignore
                         _a.sent();
                         return [2 /*return*/];
                 }
@@ -449,7 +447,42 @@ exports.CoverageWriter = CoverageWriter;
 
 /***/ }),
 
-/***/ 84553:
+/***/ 66638:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+exports.__esModule = true;
+exports.AdapterFactory = void 0;
+var core_1 = __nccwpck_require__(42186);
+var DynamoDBAdapter_1 = __nccwpck_require__(18827);
+var JsonblobAdapter_1 = __nccwpck_require__(87299);
+var AdapterFactory = /** @class */ (function () {
+    function AdapterFactory() {
+    }
+    AdapterFactory.createAdapter = function (adapterType) {
+        if (!this.isValidAdapterType(adapterType)) {
+            var error = new Error("".concat(adapterType, " is not a valid adapter type, valid adapter types are Jsonblob and DynamoDB"));
+            (0, core_1.setFailed)(error);
+            throw error;
+        }
+        return new this.adapterMap[adapterType]();
+    };
+    AdapterFactory.isValidAdapterType = function (adapterType) {
+        return ["DynamoDB", "Jsonblob"].includes(adapterType);
+    };
+    AdapterFactory.adapterMap = {
+        Jsonblob: JsonblobAdapter_1.JsonblobAdapter,
+        DynamoDB: DynamoDBAdapter_1.DynamoDBAdapter
+    };
+    return AdapterFactory;
+}());
+exports.AdapterFactory = AdapterFactory;
+
+
+/***/ }),
+
+/***/ 18827:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -575,7 +608,7 @@ exports.DynamoDBAdapter = DynamoDBAdapter;
 
 /***/ }),
 
-/***/ 99723:
+/***/ 87299:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -652,41 +685,6 @@ exports.JsonblobAdapter = JsonblobAdapter;
 
 /***/ }),
 
-/***/ 66638:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-exports.__esModule = true;
-exports.AdapterFactory = void 0;
-var core_1 = __nccwpck_require__(42186);
-var DynamoDBAdapter_1 = __nccwpck_require__(84553);
-var JsonblobAdapter_1 = __nccwpck_require__(99723);
-var AdapterFactory = /** @class */ (function () {
-    function AdapterFactory() {
-    }
-    AdapterFactory.createAdapter = function (adapterType) {
-        if (!this.isValidAdapterType(adapterType)) {
-            var error = new Error("".concat(adapterType, " is not a valid adapter type, valid adapter types are Jsonblob and DynamoDB"));
-            (0, core_1.setFailed)(error);
-            throw error;
-        }
-        return new this.adapterMap[adapterType]();
-    };
-    AdapterFactory.isValidAdapterType = function (adapterType) {
-        return ["DynamoDB", "Jsonblob"].includes(adapterType);
-    };
-    AdapterFactory.adapterMap = {
-        Jsonblob: JsonblobAdapter_1.JsonblobAdapter,
-        DynamoDB: DynamoDBAdapter_1.DynamoDBAdapter
-    };
-    return AdapterFactory;
-}());
-exports.AdapterFactory = AdapterFactory;
-
-
-/***/ }),
-
 /***/ 19957:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -734,50 +732,41 @@ var ActionConfiguration_1 = __nccwpck_require__(24167);
 var Action_1 = __nccwpck_require__(67025);
 var CoverageReader_1 = __nccwpck_require__(54414);
 var CoverageWriter_1 = __nccwpck_require__(86260);
-var CoverageActions = /** @class */ (function () {
-    function CoverageActions(config) {
-        this.config = config;
-        this.bootstrap();
-    }
-    CoverageActions.prototype.bootstrap = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var executionStatus;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.run()];
-                    case 1:
-                        executionStatus = _a.sent();
-                        if (executionStatus === Action_1.ExecutionStatus.Failed) {
-                            (0, core_1.setFailed)('The coverage actions have failed');
-                            return [2 /*return*/];
-                        }
-                        (0, core_1.info)('The coverage actions have succeeded');
-                        return [2 /*return*/];
+var main = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var executionStatus;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, run(ActionConfiguration_1.ActionConfiguration.loadConfiguration())];
+            case 1:
+                executionStatus = _a.sent();
+                if (executionStatus === Action_1.ExecutionStatus.Failed) {
+                    (0, core_1.setFailed)('The coverage actions have failed');
+                    return [2 /*return*/];
                 }
-            });
+                (0, core_1.info)('The coverage actions have succeeded');
+                return [2 /*return*/];
+        }
+    });
+}); };
+function run(config) {
+    return __awaiter(this, void 0, void 0, function () {
+        var coverageReader, coverageWriter;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    if (!(config.actionType === "read")) return [3 /*break*/, 2];
+                    coverageReader = new CoverageReader_1.CoverageReader(config);
+                    return [4 /*yield*/, coverageReader.execute()];
+                case 1: return [2 /*return*/, _a.sent()];
+                case 2:
+                    coverageWriter = new CoverageWriter_1.CoverageWriter(config);
+                    return [4 /*yield*/, coverageWriter.execute()];
+                case 3: return [2 /*return*/, _a.sent()];
+            }
         });
-    };
-    CoverageActions.prototype.run = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var coverageReader, coverageWriter;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!(this.config.actionType === "read")) return [3 /*break*/, 2];
-                        coverageReader = new CoverageReader_1.CoverageReader(this.config);
-                        return [4 /*yield*/, coverageReader.execute()];
-                    case 1: return [2 /*return*/, _a.sent()];
-                    case 2:
-                        coverageWriter = new CoverageWriter_1.CoverageWriter(this.config);
-                        return [4 /*yield*/, coverageWriter.execute()];
-                    case 3: return [2 /*return*/, _a.sent()];
-                }
-            });
-        });
-    };
-    return CoverageActions;
-}());
-exports["default"] = new CoverageActions(ActionConfiguration_1.ActionConfiguration.loadConfiguration());
+    });
+}
+main();
 
 
 /***/ }),

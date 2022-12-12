@@ -1,5 +1,5 @@
 import { ActionConfiguration } from "../../config/ActionConfiguration";
-import { Coverage } from "../Adapters/Adapter";
+import { Coverage } from "../StorageAdapters/Adapter";
 import { Action, ExecutionStatus } from "./Action";
 
 export class CoverageWriter implements Action {

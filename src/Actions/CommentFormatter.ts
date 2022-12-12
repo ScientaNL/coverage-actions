@@ -1,6 +1,8 @@
-import { Coverage, CoverageDiff } from "../Adapters/Adapter";
+import { Coverage, CoverageDiff } from "../StorageAdapters/Adapter";
 
 export class CommentFormatter {
+
+	public static readonly CommentIdentifier: string = "coverage:";
 	
 	public constructor(
 		private readonly coverageDiff: CoverageDiff,

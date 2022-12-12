@@ -1,12 +1,11 @@
 import { getOctokit } from "@actions/github";
 import { GitHub } from "@actions/github/lib/utils";
-import { Coverage, CoverageDiff } from "../Adapters/Adapter";
+import { Coverage, CoverageDiff } from "../StorageAdapters/Adapter";
 import { CommentFormatter } from "./CommentFormatter";
 
 export class CommentWriter {
 	private octokit: InstanceType<typeof GitHub>;
 	private commentFormatter: CommentFormatter;
-
 
 	public constructor(
 		private readonly pullRequest: number,
@@ -36,7 +35,7 @@ export class CommentWriter {
 		});
 
 		for (const comment of Object.values(comments.data)) {
-			if (comment.body?.includes("coverage:")) {
+			if (comment.body?.includes(CommentFormatter.CommentIdentifier)) {
 				await this.update(
 					commentBody,
 					comment.id,
@@ -51,9 +50,8 @@ export class CommentWriter {
 	}
 
 	private async create(
-		comment: string,
+		comment: string
 	): Promise<void> {
-		// @ts-ignore
 		await this.octokit.rest.issues.createComment({
 			owner: this.owner,
 			repo: this.repo,
