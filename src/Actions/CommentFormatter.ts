@@ -28,8 +28,15 @@ export class CommentFormatter {
 	
 	private heading(): string {
 		let heading = '```diff\n';
+		let headingStatus: string = '- ';
 
-		heading += ((this.coverageDiff.linesDiff > 0) ? '+' : '-') + ' lines: from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) +'% (' + ((this.coverageDiff.linesDiff > 0) ? '+' : '-') + this.coverageDiff.linesDiff.toFixed(2) + '%)\n';
+		if (this.coverageDiff.linesDiff === 0 ) {
+			headingStatus = '! '
+		} else if (this.coverageDiff.linesDiff > 0) {
+			headingStatus = '+ ';
+		}
+
+		heading += headingStatus + ' lines: from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) +'% (' + ((this.coverageDiff.linesDiff > 0) ? '+' : '-') + this.coverageDiff.linesDiff.toFixed(2) + '%)\n';
 		heading += '```\n\n';
 
 		return heading;
