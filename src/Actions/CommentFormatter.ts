@@ -27,7 +27,7 @@ export class CommentFormatter {
 	private heading(): string {
 		let heading = '```diff\n';
 
-		// heading += (this.coverageDiff.linesDiff > 0) ? '+' : '-' + 'lines: from ' + this.headCoverage.linesCoverage + '% to ' + this.coverage.linesCoverage +'% (' + (this.coverageDiff.linesDiff > 0) ? '+' : '-' + this.coverageDiff.linesDiff + '%)\n';
+		heading += ((this.coverageDiff.linesDiff > 0) ? '+' : '-') + ' lines: from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) +'% (' + ((this.coverageDiff.linesDiff > 0) ? '+' : '-') + this.coverageDiff.linesDiff.toFixed(2) + '%)\n';
 		heading += '- deze moet ik nog fixen huil huil\n';
 		heading += '```\n\n';
 
