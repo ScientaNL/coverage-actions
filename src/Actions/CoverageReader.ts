@@ -1,5 +1,5 @@
 import { ActionConfiguration } from "../../config/ActionConfiguration";
-import { Coverage, CoverageDiff } from "../Adapters/Adapter";
+import { Coverage, CoverageDiff } from "../StorageAdapters/Adapter";
 import { CommentWriter } from "./CommentWriter";
 import { Action, ExecutionStatus } from "./Action";
 

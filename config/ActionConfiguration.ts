@@ -1,5 +1,5 @@
 import { getInput, setFailed } from "@actions/core";
-import { Adapter, Coverage } from "../src/Adapters/Adapter";
+import { Adapter, Coverage } from "../src/StorageAdapters/Adapter";
 import { AdapterFactory } from "../src/Factory/AdapterFactory";
 
 export type ActionType = "read" | "save";

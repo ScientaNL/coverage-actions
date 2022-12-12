@@ -4,36 +4,28 @@ import { ExecutionStatus } from "./Actions/Action";
 import { CoverageReader } from "./Actions/CoverageReader";
 import { CoverageWriter } from "./Actions/CoverageWriter";
 
-class CoverageActions {
-	constructor(
-		private readonly config: ActionConfiguration
-	) {
-		this.bootstrap();
-	}
+const main = async () => {
+	const executionStatus = await run(
+		ActionConfiguration.loadConfiguration(),
+	);
 
-	private async bootstrap(): Promise<void> {
-		const executionStatus = await this.run();
-
-		if (executionStatus === ExecutionStatus.Failed) {
-			setFailed('The coverage actions have failed');
-			return;
-		}
-
-		info('The coverage actions have succeeded');
+	if (executionStatus === ExecutionStatus.Failed) {
+		setFailed('The coverage actions have failed');
 		return;
 	}
 
-	private async run(): Promise<ExecutionStatus> {
-		if (this.config.actionType === "read") {
-			const coverageReader = new CoverageReader(this.config);
-			return await coverageReader.execute();
-		}
-
-		const coverageWriter = new CoverageWriter(this.config);
-		return await coverageWriter.execute();
-	}
+	info('The coverage actions have succeeded');
+	return;
 }
 
-export default new CoverageActions(
-	ActionConfiguration.loadConfiguration(),
-);
+async function run(config: ActionConfiguration): Promise<ExecutionStatus> {
+	if (config.actionType === "read") {
+	const coverageReader = new CoverageReader(config);
+	return await coverageReader.execute();
+}
+
+	const coverageWriter = new CoverageWriter(config);
+	return await coverageWriter.execute();
+}
+
+main();
