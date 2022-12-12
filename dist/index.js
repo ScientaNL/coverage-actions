@@ -91,7 +91,6 @@ var CommentFormatter = /** @class */ (function () {
     CommentFormatter.prototype.heading = function () {
         var heading = '```diff\n';
         heading += ((this.coverageDiff.linesDiff > 0) ? '+' : '-') + ' lines: from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '% (' + ((this.coverageDiff.linesDiff > 0) ? '+' : '-') + this.coverageDiff.linesDiff.toFixed(2) + '%)\n';
-        heading += '- deze moet ik nog fixen huil huil\n';
         heading += '```\n\n';
         return heading;
     };
