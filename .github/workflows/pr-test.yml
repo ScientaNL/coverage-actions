@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
 env:
-  JSONBLOB_ID: "1048215432397602816"
+  JSONBLOB_ID: ${{ secrets.JSONBLOB_ID }}
 jobs:
   test-pr:
     runs-on: ubuntu-latest
