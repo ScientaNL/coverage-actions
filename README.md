@@ -1,6 +1,24 @@
 # coverage-actions
 Comment coverage difference on PR and save current coverage to endpoint
 
+![GitHub release (release name instead of tag name)](https://img.shields.io/github/v/release/ScientaNL/coverage-actions?display_name=tag&include_prereleases)
+![GitHub](https://img.shields.io/github/license/ScientaNL/coverage-actions)
+![GitHub Repo stars](https://img.shields.io/github/stars/ScientaNL/coverage-actions?label=Repository%20stars)
+![GitHub Org's stars](https://img.shields.io/github/stars/ScientaNL?label=ScientaNL%20stars)
+
+#### Dependencies
+- ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/ScientaNL/coverage-actions/@actions/core)
+- ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/ScientaNL/coverage-actions/@actions/github)
+- ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/ScientaNL/coverage-actions/@aws-sdk/client-dynamodb)
+- ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/ScientaNL/coverage-actions/@aws-sdk/credential-providers)
+- ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/ScientaNL/coverage-actions/@aws-sdk/lib-dynamodb)
+- ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/ScientaNL/coverage-actions/axios)
+
+#### Dev dependencies
+- ![GitHub package.json dependency version (dev dep on branch)](https://img.shields.io/github/package-json/dependency-version/ScientaNL/coverage-actions/dev/typescript)
+- ![GitHub package.json dependency version (dev dep on branch)](https://img.shields.io/github/package-json/dependency-version/ScientaNL/coverage-actions/dev/@types/node)
+- ![GitHub package.json dependency version (prod)](https://img.shields.io/github/package-json/dependency-version/ScientaNL/coverage-actions/@vercel/ncc)
+
 ### Build
 To build the dist file run: 
 ```bash
