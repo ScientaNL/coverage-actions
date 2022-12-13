@@ -67,17 +67,21 @@ var ExecutionStatus;
 /***/ }),
 
 /***/ 19857:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 exports.__esModule = true;
 exports.CommentFormatter = void 0;
+var core_1 = __nccwpck_require__(42186);
 var CommentFormatter = /** @class */ (function () {
     function CommentFormatter(coverageDiff, headCoverage, coverage) {
         this.coverageDiff = coverageDiff;
         this.headCoverage = headCoverage;
         this.coverage = coverage;
+        (0, core_1.info)("Head coverage: ".concat(headCoverage));
+        (0, core_1.info)("Coverage: ".concat(coverage));
+        (0, core_1.info)("Diff: ".concat(coverageDiff));
     }
     CommentFormatter.prototype.writeCommentBody = function () {
         var comment = this.heading();

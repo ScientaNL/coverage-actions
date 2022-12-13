@@ -4,18 +4,6 @@ inputs:
   action_type:
     description: 'Read the coverage from remote and comment it on the pr or write a new coverage to a remote'
     required: true
-  token:
-    description: 'The token to access github, only required on read'
-    required: false
-  pr_number:
-    description: 'The pull request number'
-    required: true
-  repo:
-    description: 'The repository on which to execute'
-    required: true
-  owner:
-    description: 'The aforementioned repository owner'
-    required: true
   lines_coverage:
     description: 'The new (current branch) calculated lines coverage'
     required: true
@@ -28,6 +16,18 @@ inputs:
   storage_adapter:
     description: 'The storage adapter to use, available now are DynamoDB and Jsonblob'
     required: true
+  token:
+    description: 'The token to access github, only required on read'
+    required: false
+  pr_number:
+    description: 'The pull request number, only required on read'
+    required: false
+  repo:
+    description: 'The repository on which to execute, only required on read'
+    required: false
+  owner:
+    description: 'The aforementioned repository owner, only required on read'
+    required: false
 runs:
   using: 'node16'
   main: 'dist/index.js'

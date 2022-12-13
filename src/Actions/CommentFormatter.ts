@@ -1,3 +1,4 @@
+import { info } from "@actions/core";
 import { Coverage, CoverageDiff } from "../StorageAdapters/Adapter";
 
 export class CommentFormatter {
@@ -9,6 +10,9 @@ export class CommentFormatter {
 		private readonly headCoverage: Coverage,
 		private readonly coverage: Coverage
 	) {
+		info(`Head coverage: ${headCoverage}`);
+		info(`Coverage: ${coverage}`);
+		info(`Diff: ${coverageDiff}`);
 	}
 	
 	public writeCommentBody(
@@ -22,7 +26,7 @@ export class CommentFormatter {
 		comment += this.classCoverage();
 
 		comment += '</details>';
-
+		
 		return comment;
 	}
 	
@@ -41,7 +45,7 @@ export class CommentFormatter {
 
 		return heading;
 	}
-	
+
 	private linesCoverage(): string {
 		let linesCoverage = 'Lines coverage:\n```diff\n';
 		if (this.coverageDiff.linesDiff > 0) {
@@ -58,7 +62,7 @@ export class CommentFormatter {
 
 		return linesCoverage;
 	}
-	
+
 	private methodCoverage(): string {
 		let methodCoverage = 'Method coverage:\n```diff\n';
 
@@ -77,7 +81,7 @@ export class CommentFormatter {
 
 		return methodCoverage;
 	}
-	
+
 	private classCoverage(): string {
 		let classCoverage = 'Class coverage:\n```diff\n';
 
