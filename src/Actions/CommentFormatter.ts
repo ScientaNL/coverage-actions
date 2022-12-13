@@ -22,7 +22,7 @@ export class CommentFormatter {
 		comment += this.classCoverage();
 
 		comment += '</details>';
-
+		
 		return comment;
 	}
 	
@@ -41,7 +41,7 @@ export class CommentFormatter {
 
 		return heading;
 	}
-	
+
 	private linesCoverage(): string {
 		let linesCoverage = 'Lines coverage:\n```diff\n';
 		if (this.coverageDiff.linesDiff > 0) {
@@ -58,7 +58,7 @@ export class CommentFormatter {
 
 		return linesCoverage;
 	}
-	
+
 	private methodCoverage(): string {
 		let methodCoverage = 'Method coverage:\n```diff\n';
 
@@ -77,7 +77,7 @@ export class CommentFormatter {
 
 		return methodCoverage;
 	}
-	
+
 	private classCoverage(): string {
 		let classCoverage = 'Class coverage:\n```diff\n';
 

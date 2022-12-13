@@ -577,7 +577,7 @@ var DynamoDBAdapter = /** @class */ (function () {
     DynamoDBAdapter.prototype.pullCoverage = function () {
         var _a;
         return __awaiter(this, void 0, void 0, function () {
-            var data, error;
+            var data, error, coverage;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, this.getDynamoDbDocumentClient()
@@ -594,7 +594,15 @@ var DynamoDBAdapter = /** @class */ (function () {
                             (0, core_1.setFailed)(error);
                             throw error;
                         }
-                        return [2 /*return*/, data.Item.coverage];
+                        coverage = {
+                            // @ts-ignore
+                            linesCoverage: parseFloat(data.Item.coverage.linesCoverage),
+                            // @ts-ignore
+                            classCoverage: parseFloat(data.Item.coverage.classCoverage),
+                            // @ts-ignore
+                            methodCoverage: parseFloat(data.Item.coverage.methodCoverage)
+                        };
+                        return [2 /*return*/, coverage];
                 }
             });
         });
