@@ -50,7 +50,16 @@ export class DynamoDBAdapter implements Adapter {
 			throw error;
 		}
 
-		return data.Item.coverage;
+		const coverage: Coverage = {
+			// @ts-ignore
+			linesCoverage: parseFloat(data.Item.coverage.linesCoverage),
+			// @ts-ignore
+			classCoverage: parseFloat(data.Item.coverage.classCoverage),
+			// @ts-ignore
+			methodCoverage: parseFloat(data.Item.coverage.methodCoverage),
+		}
+
+		return coverage;
 	}
 
 	private readonly isCoverageType = (commandOutput: object): commandOutput is Coverage => {
