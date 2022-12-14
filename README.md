@@ -1,7 +1,7 @@
 # coverage-actions
 Comment coverage difference on PR and save current coverage to endpoint
 
-![GitHub release (release name instead of tag name)](https://img.shields.io/github/v/release/ScientaNL/coverage-actions?display_name=tag&include_prereleases)
+![GitHub release (release name instead of tag name)](https://img.shields.io/github/v/release/ScientaNL/coverage-actions?include_prereleases)
 ![GitHub](https://img.shields.io/github/license/ScientaNL/coverage-actions)
 ![GitHub Repo stars](https://img.shields.io/github/stars/ScientaNL/coverage-actions?label=Repository%20stars)
 ![GitHub Org's stars](https://img.shields.io/github/stars/ScientaNL?label=ScientaNL%20stars)
