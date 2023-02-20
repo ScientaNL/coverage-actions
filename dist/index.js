@@ -1,791 +1,6 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 24167:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-exports.__esModule = true;
-exports.ActionConfiguration = void 0;
-var core_1 = __nccwpck_require__(42186);
-var AdapterFactory_1 = __nccwpck_require__(66638);
-var ActionConfiguration = /** @class */ (function () {
-    function ActionConfiguration(token, pullRequest, actionType, storageAdapter, repo, owner, linesCoverage, methodCoverage, classCoverage) {
-        this.token = token;
-        this.pullRequest = pullRequest;
-        this.actionType = actionType;
-        this.storageAdapter = storageAdapter;
-        this.repo = repo;
-        this.owner = owner;
-        this.linesCoverage = linesCoverage;
-        this.methodCoverage = methodCoverage;
-        this.classCoverage = classCoverage;
-    }
-    ActionConfiguration.loadConfiguration = function () {
-        return new ActionConfiguration((0, core_1.getInput)('token'), parseInt((0, core_1.getInput)('pr_number')), ActionConfiguration.verifyInputActionType((0, core_1.getInput)('action_type')), AdapterFactory_1.AdapterFactory.createAdapter((0, core_1.getInput)('storage_adapter')), (0, core_1.getInput)('repo'), (0, core_1.getInput)('owner'), parseFloat((0, core_1.getInput)('lines_coverage')), parseFloat((0, core_1.getInput)('method_coverage')), parseFloat((0, core_1.getInput)('class_coverage')));
-    };
-    ActionConfiguration.prototype.loadCoverage = function () {
-        return {
-            linesCoverage: this.linesCoverage,
-            methodCoverage: this.methodCoverage,
-            classCoverage: this.classCoverage
-        };
-    };
-    ActionConfiguration.verifyInputActionType = function (actionInput) {
-        if (!ActionConfiguration.isActionType(actionInput)) {
-            var error = new Error('The input is not part of the allowed input action types, the allowed types are, read and save');
-            (0, core_1.setFailed)(error);
-            throw error;
-        }
-        return actionInput;
-    };
-    ActionConfiguration.isActionType = function (actionInput) {
-        return ["read", "readAndSave", "save"].includes(actionInput);
-    };
-    return ActionConfiguration;
-}());
-exports.ActionConfiguration = ActionConfiguration;
-
-
-/***/ }),
-
-/***/ 67025:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-exports.__esModule = true;
-exports.ExecutionStatus = void 0;
-var ExecutionStatus;
-(function (ExecutionStatus) {
-    ExecutionStatus["Failed"] = "FAILED";
-    ExecutionStatus["Success"] = "SUCCESS";
-})(ExecutionStatus = exports.ExecutionStatus || (exports.ExecutionStatus = {}));
-
-
-/***/ }),
-
-/***/ 19857:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-exports.__esModule = true;
-exports.CommentFormatter = void 0;
-var CommentFormatter = /** @class */ (function () {
-    function CommentFormatter(coverageDiff, headCoverage, coverage) {
-        this.coverageDiff = coverageDiff;
-        this.headCoverage = headCoverage;
-        this.coverage = coverage;
-    }
-    CommentFormatter.prototype.writeCommentBody = function () {
-        var comment = this.heading();
-        comment += '<details>\n<summary>Coverage Report:</summary>\n\n';
-        comment += this.linesCoverage();
-        comment += this.methodCoverage();
-        comment += this.classCoverage();
-        comment += '</details>';
-        return comment;
-    };
-    CommentFormatter.prototype.heading = function () {
-        var heading = '```diff\n';
-        var headingStatus = '- ';
-        if (this.coverageDiff.linesDiff === 0) {
-            headingStatus = '! ';
-        }
-        else if (this.coverageDiff.linesDiff > 0) {
-            headingStatus = '+ ';
-        }
-        heading += headingStatus + ' lines: from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '% (' + ((this.coverageDiff.linesDiff > 0) ? '+' : '') + this.coverageDiff.linesDiff.toFixed(2) + '%)\n';
-        heading += '```\n\n';
-        return heading;
-    };
-    CommentFormatter.prototype.linesCoverage = function () {
-        var linesCoverage = 'Lines coverage:\n```diff\n';
-        if (this.coverageDiff.linesDiff > 0) {
-            linesCoverage += '+ the line coverage has gone up by ' + this.coverageDiff.linesDiff.toFixed(2) + '%\n';
-            linesCoverage += '+ from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '%\n';
-        }
-        else if (this.coverageDiff.linesDiff === 0) {
-            linesCoverage += '! the lines coverage has stayed the same\n';
-            linesCoverage += '! the coverage is ' + this.coverage.linesCoverage + '%\n';
-        }
-        else {
-            linesCoverage += '- the line coverage has gone down by ' + this.coverageDiff.linesDiff.toFixed(2) + '%\n';
-            linesCoverage += '- from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '%\n';
-        }
-        linesCoverage += '```\n\n';
-        return linesCoverage;
-    };
-    CommentFormatter.prototype.methodCoverage = function () {
-        var methodCoverage = 'Method coverage:\n```diff\n';
-        if (this.coverageDiff.methodDiff > 0) {
-            methodCoverage += '+ the method coverage has gone up by ' + this.coverageDiff.methodDiff.toFixed(2) + '%\n';
-            methodCoverage += '+ from ' + this.headCoverage.methodCoverage.toFixed(2) + '% to ' + this.coverage.methodCoverage.toFixed(2) + '%\n';
-        }
-        else if (this.coverageDiff.methodDiff === 0) {
-            methodCoverage += '! the method coverage has stayed the same\n';
-            methodCoverage += '! the coverage is ' + this.coverage.methodCoverage + '%\n';
-        }
-        else {
-            methodCoverage += '- the method coverage has gone down by ' + this.coverageDiff.methodDiff.toFixed(2) + '%\n';
-            methodCoverage += '- from ' + this.headCoverage.methodCoverage.toFixed(2) + '% to ' + this.coverage.methodCoverage.toFixed(2) + '%\n';
-        }
-        methodCoverage += '```\n\n';
-        return methodCoverage;
-    };
-    CommentFormatter.prototype.classCoverage = function () {
-        var classCoverage = 'Class coverage:\n```diff\n';
-        if (this.coverageDiff.classDiff > 0) {
-            classCoverage += '+ the class coverage has gone up by ' + this.coverageDiff.classDiff.toFixed(2) + '%\n';
-            classCoverage += '+ from ' + this.headCoverage.classCoverage.toFixed(2) + '% to ' + this.coverage.classCoverage.toFixed(2) + '%\n';
-        }
-        else if (this.coverageDiff.classDiff === 0) {
-            classCoverage += '! the class coverage has stayed the same\n';
-            classCoverage += '! the coverage is ' + this.coverage.classCoverage + '%\n';
-        }
-        else {
-            classCoverage += '- the class coverage has gone down by ' + this.coverageDiff.classDiff.toFixed(2) + '%\n';
-            classCoverage += '- from ' + this.headCoverage.classCoverage.toFixed(2) + '% to ' + this.coverage.classCoverage.toFixed(2) + '%\n';
-        }
-        classCoverage += '```\n\n';
-        return classCoverage;
-    };
-    CommentFormatter.CommentIdentifier = "coverage:";
-    return CommentFormatter;
-}());
-exports.CommentFormatter = CommentFormatter;
-
-
-/***/ }),
-
-/***/ 56447:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-exports.CommentWriter = void 0;
-var github_1 = __nccwpck_require__(95438);
-var CommentFormatter_1 = __nccwpck_require__(19857);
-var CommentWriter = /** @class */ (function () {
-    function CommentWriter(pullRequest, token, repo, owner, coverageDiff, headCoverage, coverage) {
-        this.pullRequest = pullRequest;
-        this.token = token;
-        this.repo = repo;
-        this.owner = owner;
-        this.coverageDiff = coverageDiff;
-        this.headCoverage = headCoverage;
-        this.coverage = coverage;
-        this.octokit = (0, github_1.getOctokit)(this.token);
-        this.commentFormatter = new CommentFormatter_1.CommentFormatter(this.coverageDiff, this.headCoverage, this.coverage);
-    }
-    CommentWriter.prototype.write = function () {
-        var _a;
-        return __awaiter(this, void 0, void 0, function () {
-            var commentBody, comments, _i, _b, comment;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
-                    case 0:
-                        commentBody = this.commentFormatter.writeCommentBody();
-                        return [4 /*yield*/, this.octokit.rest.issues.listComments({
-                                owner: this.owner,
-                                repo: this.repo,
-                                issue_number: this.pullRequest
-                            })];
-                    case 1:
-                        comments = _c.sent();
-                        _i = 0, _b = Object.values(comments.data);
-                        _c.label = 2;
-                    case 2:
-                        if (!(_i < _b.length)) return [3 /*break*/, 5];
-                        comment = _b[_i];
-                        if (!((_a = comment.body) === null || _a === void 0 ? void 0 : _a.includes(CommentFormatter_1.CommentFormatter.CommentIdentifier))) return [3 /*break*/, 4];
-                        return [4 /*yield*/, this.update(commentBody, comment.id)];
-                    case 3:
-                        _c.sent();
-                        return [2 /*return*/];
-                    case 4:
-                        _i++;
-                        return [3 /*break*/, 2];
-                    case 5: return [4 /*yield*/, this.create(commentBody)];
-                    case 6:
-                        _c.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    CommentWriter.prototype.create = function (comment) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.octokit.rest.issues.createComment({
-                            owner: this.owner,
-                            repo: this.repo,
-                            issue_number: this.pullRequest,
-                            body: comment
-                        })];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    CommentWriter.prototype.update = function (comment, commentId) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.octokit.rest.issues.updateComment({
-                            owner: this.owner,
-                            repo: this.repo,
-                            comment_id: commentId,
-                            body: comment
-                        })];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    return CommentWriter;
-}());
-exports.CommentWriter = CommentWriter;
-
-
-/***/ }),
-
-/***/ 54414:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-exports.CoverageReader = void 0;
-var CommentWriter_1 = __nccwpck_require__(56447);
-var Action_1 = __nccwpck_require__(67025);
-var CoverageReader = /** @class */ (function () {
-    function CoverageReader(config) {
-        this.config = config;
-    }
-    CoverageReader.prototype.execute = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var headCoverage, coverage, coverageDiff, commentWriter;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.config.storageAdapter.pullCoverage()];
-                    case 1:
-                        headCoverage = _a.sent();
-                        coverage = this.config.loadCoverage();
-                        coverageDiff = {
-                            linesDiff: coverage.linesCoverage - headCoverage.linesCoverage,
-                            classDiff: coverage.classCoverage - headCoverage.classCoverage,
-                            methodDiff: coverage.methodCoverage - headCoverage.methodCoverage
-                        };
-                        commentWriter = new CommentWriter_1.CommentWriter(this.config.pullRequest, this.config.token, this.config.repo, this.config.owner, coverageDiff, headCoverage, coverage);
-                        return [4 /*yield*/, commentWriter.write()];
-                    case 2:
-                        _a.sent();
-                        return [2 /*return*/, Action_1.ExecutionStatus.Success];
-                }
-            });
-        });
-    };
-    return CoverageReader;
-}());
-exports.CoverageReader = CoverageReader;
-
-
-/***/ }),
-
-/***/ 86260:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-exports.CoverageWriter = void 0;
-var Action_1 = __nccwpck_require__(67025);
-var CoverageWriter = /** @class */ (function () {
-    function CoverageWriter(config) {
-        this.config = config;
-    }
-    CoverageWriter.prototype.execute = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var coverage, err_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        coverage = this.config.loadCoverage();
-                        _a.label = 1;
-                    case 1:
-                        _a.trys.push([1, 3, , 4]);
-                        return [4 /*yield*/, this.config.storageAdapter.putCoverage({
-                                linesCoverage: coverage.linesCoverage,
-                                classCoverage: coverage.classCoverage,
-                                methodCoverage: coverage.methodCoverage
-                            })];
-                    case 2:
-                        _a.sent();
-                        return [3 /*break*/, 4];
-                    case 3:
-                        err_1 = _a.sent();
-                        return [2 /*return*/, Action_1.ExecutionStatus.Failed];
-                    case 4: return [2 /*return*/, Action_1.ExecutionStatus.Success];
-                }
-            });
-        });
-    };
-    return CoverageWriter;
-}());
-exports.CoverageWriter = CoverageWriter;
-
-
-/***/ }),
-
-/***/ 66638:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
-
-"use strict";
-
-exports.__esModule = true;
-exports.AdapterFactory = void 0;
-var core_1 = __nccwpck_require__(42186);
-var DynamoDBAdapter_1 = __nccwpck_require__(18827);
-var JsonblobAdapter_1 = __nccwpck_require__(87299);
-var AdapterFactory = /** @class */ (function () {
-    function AdapterFactory() {
-    }
-    AdapterFactory.createAdapter = function (adapterType) {
-        if (!this.isValidAdapterType(adapterType)) {
-            var error = new Error("".concat(adapterType, " is not a valid adapter type, valid adapter types are Jsonblob and DynamoDB"));
-            (0, core_1.setFailed)(error);
-            throw error;
-        }
-        return new this.adapterMap[adapterType]();
-    };
-    AdapterFactory.isValidAdapterType = function (adapterType) {
-        return ["DynamoDB", "Jsonblob"].includes(adapterType);
-    };
-    AdapterFactory.adapterMap = {
-        Jsonblob: JsonblobAdapter_1.JsonblobAdapter,
-        DynamoDB: DynamoDBAdapter_1.DynamoDBAdapter
-    };
-    return AdapterFactory;
-}());
-exports.AdapterFactory = AdapterFactory;
-
-
-/***/ }),
-
-/***/ 18827:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-exports.DynamoDBAdapter = void 0;
-var core_1 = __nccwpck_require__(42186);
-var lib_dynamodb_1 = __nccwpck_require__(15219);
-var client_dynamodb_1 = __nccwpck_require__(23363);
-var credential_providers_1 = __nccwpck_require__(37464);
-var DynamoDBAdapter = /** @class */ (function () {
-    function DynamoDBAdapter() {
-        this.client = null;
-        this.isCoverageType = function (commandOutput) {
-            return ('linesCoverage' in commandOutput && 'classCoverage' in commandOutput && 'methodCoverage' in commandOutput);
-        };
-    }
-    DynamoDBAdapter.prototype.putCoverage = function (coverage) {
-        return __awaiter(this, void 0, void 0, function () {
-            var documentClient;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        documentClient = this.getDynamoDbDocumentClient();
-                        return [4 /*yield*/, documentClient.send(new lib_dynamodb_1.UpdateCommand({
-                                TableName: "coverage-storage",
-                                Key: {
-                                    id: process.env.COVERAGE_STORAGE_ID
-                                },
-                                ExpressionAttributeNames: {
-                                    "#l": "linesCoverage",
-                                    "#m": "methodCoverage",
-                                    "#c": "classCoverage"
-                                },
-                                UpdateExpression: "set coverage.#l = :l, coverage.#m = :m, coverage.#c = :c",
-                                ExpressionAttributeValues: {
-                                    ":l": coverage.linesCoverage,
-                                    ":m": coverage.methodCoverage,
-                                    ":c": coverage.classCoverage
-                                }
-                            }))];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    DynamoDBAdapter.prototype.pullCoverage = function () {
-        var _a;
-        return __awaiter(this, void 0, void 0, function () {
-            var data, error, coverage;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0: return [4 /*yield*/, this.getDynamoDbDocumentClient()
-                            .send(new lib_dynamodb_1.GetCommand({
-                            TableName: "coverage-storage",
-                            Key: {
-                                id: process.env.COVERAGE_STORAGE_ID
-                            }
-                        }))];
-                    case 1:
-                        data = _b.sent();
-                        if (!data.Item || !this.isCoverageType((_a = data.Item) === null || _a === void 0 ? void 0 : _a.coverage)) {
-                            error = new Error('The data from the DynamoDB response is invalid');
-                            (0, core_1.setFailed)(error);
-                            throw error;
-                        }
-                        coverage = {
-                            // @ts-ignore
-                            linesCoverage: parseFloat(data.Item.coverage.linesCoverage),
-                            // @ts-ignore
-                            classCoverage: parseFloat(data.Item.coverage.classCoverage),
-                            // @ts-ignore
-                            methodCoverage: parseFloat(data.Item.coverage.methodCoverage)
-                        };
-                        return [2 /*return*/, coverage];
-                }
-            });
-        });
-    };
-    DynamoDBAdapter.prototype.getDynamoDbDocumentClient = function () {
-        if (this.client) {
-            return this.client;
-        }
-        return this.client = lib_dynamodb_1.DynamoDBDocumentClient.from(new client_dynamodb_1.DynamoDBClient({
-            credentials: (0, credential_providers_1.fromEnv)(),
-            region: process.env.AWS_REGION
-        }));
-    };
-    return DynamoDBAdapter;
-}());
-exports.DynamoDBAdapter = DynamoDBAdapter;
-
-
-/***/ }),
-
-/***/ 87299:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-exports.JsonblobAdapter = void 0;
-var axios_1 = __nccwpck_require__(88757);
-var JsonblobAdapter = /** @class */ (function () {
-    function JsonblobAdapter() {
-        this.JSONBLOB_URL = 'https://jsonblob.com/api/';
-    }
-    JsonblobAdapter.prototype.pullCoverage = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, axios_1["default"].get(this.JSONBLOB_URL + process.env.JSONBLOB_ID)];
-                    case 1: return [2 /*return*/, (_a.sent()).data];
-                }
-            });
-        });
-    };
-    JsonblobAdapter.prototype.putCoverage = function (coverage) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0: return [4 /*yield*/, axios_1["default"].put(this.JSONBLOB_URL + process.env.JSONBLOB_ID, coverage)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
-        });
-    };
-    return JsonblobAdapter;
-}());
-exports.JsonblobAdapter = JsonblobAdapter;
-
-
-/***/ }),
-
-/***/ 19957:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-var core_1 = __nccwpck_require__(42186);
-var ActionConfiguration_1 = __nccwpck_require__(24167);
-var Action_1 = __nccwpck_require__(67025);
-var CoverageReader_1 = __nccwpck_require__(54414);
-var CoverageWriter_1 = __nccwpck_require__(86260);
-var main = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var executionStatus;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, run(ActionConfiguration_1.ActionConfiguration.loadConfiguration())];
-            case 1:
-                executionStatus = _a.sent();
-                if (executionStatus === Action_1.ExecutionStatus.Failed) {
-                    (0, core_1.setFailed)('The coverage actions have failed');
-                    return [2 /*return*/];
-                }
-                (0, core_1.info)('The coverage actions have succeeded');
-                return [2 /*return*/];
-        }
-    });
-}); };
-function run(config) {
-    return __awaiter(this, void 0, void 0, function () {
-        var coverageReader, coverageWriter;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (!(config.actionType === "read")) return [3 /*break*/, 2];
-                    coverageReader = new CoverageReader_1.CoverageReader(config);
-                    return [4 /*yield*/, coverageReader.execute()];
-                case 1: return [2 /*return*/, _a.sent()];
-                case 2:
-                    coverageWriter = new CoverageWriter_1.CoverageWriter(config);
-                    return [4 /*yield*/, coverageWriter.execute()];
-                case 3: return [2 /*return*/, _a.sent()];
-            }
-        });
-    });
-}
-main();
-
-
-/***/ }),
-
 /***/ 87351:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -50585,6 +49800,438 @@ function wrappy (fn, cb) {
 
 /***/ }),
 
+/***/ 95017:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ActionConfiguration = void 0;
+const core_1 = __nccwpck_require__(42186);
+const AdapterFactory_1 = __nccwpck_require__(3089);
+class ActionConfiguration {
+    token;
+    pullRequest;
+    actionType;
+    storageAdapter;
+    repo;
+    owner;
+    linesCoverage;
+    methodCoverage;
+    classCoverage;
+    constructor(token, pullRequest, actionType, storageAdapter, repo, owner, linesCoverage, methodCoverage, classCoverage) {
+        this.token = token;
+        this.pullRequest = pullRequest;
+        this.actionType = actionType;
+        this.storageAdapter = storageAdapter;
+        this.repo = repo;
+        this.owner = owner;
+        this.linesCoverage = linesCoverage;
+        this.methodCoverage = methodCoverage;
+        this.classCoverage = classCoverage;
+    }
+    static loadConfiguration() {
+        return new ActionConfiguration((0, core_1.getInput)('token'), parseInt((0, core_1.getInput)('pr_number')), ActionConfiguration.verifyInputActionType((0, core_1.getInput)('action_type')), AdapterFactory_1.AdapterFactory.createAdapter((0, core_1.getInput)('storage_adapter')), (0, core_1.getInput)('repo'), (0, core_1.getInput)('owner'), parseFloat((0, core_1.getInput)('lines_coverage')), parseFloat((0, core_1.getInput)('method_coverage')), parseFloat((0, core_1.getInput)('class_coverage')));
+    }
+    loadCoverage() {
+        return {
+            linesCoverage: this.linesCoverage,
+            methodCoverage: this.methodCoverage,
+            classCoverage: this.classCoverage,
+        };
+    }
+    static verifyInputActionType(actionInput) {
+        if (!ActionConfiguration.isActionType(actionInput)) {
+            const error = new Error('The input is not part of the allowed input action types, the allowed types are, read and save');
+            (0, core_1.setFailed)(error);
+            throw error;
+        }
+        return actionInput;
+    }
+    static isActionType(actionInput) {
+        return ["read", "readAndSave", "save"].includes(actionInput);
+    }
+}
+exports.ActionConfiguration = ActionConfiguration;
+
+
+/***/ }),
+
+/***/ 55018:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ExecutionStatus = void 0;
+var ExecutionStatus;
+(function (ExecutionStatus) {
+    ExecutionStatus["Failed"] = "FAILED";
+    ExecutionStatus["Success"] = "SUCCESS";
+})(ExecutionStatus = exports.ExecutionStatus || (exports.ExecutionStatus = {}));
+
+
+/***/ }),
+
+/***/ 37945:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CommentFormatter = void 0;
+class CommentFormatter {
+    coverageDiff;
+    headCoverage;
+    coverage;
+    static CommentIdentifier = "coverage:";
+    constructor(coverageDiff, headCoverage, coverage) {
+        this.coverageDiff = coverageDiff;
+        this.headCoverage = headCoverage;
+        this.coverage = coverage;
+    }
+    writeCommentBody() {
+        let comment = this.heading();
+        comment += '<details>\n<summary>Coverage Report:</summary>\n\n';
+        comment += this.linesCoverage();
+        comment += this.methodCoverage();
+        comment += this.classCoverage();
+        comment += '</details>';
+        return comment;
+    }
+    heading() {
+        let heading = '```diff\n';
+        let headingStatus = '- ';
+        if (this.coverageDiff.linesDiff === 0) {
+            headingStatus = '! ';
+        }
+        else if (this.coverageDiff.linesDiff > 0) {
+            headingStatus = '+ ';
+        }
+        heading += headingStatus + ' lines: from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '% (' + ((this.coverageDiff.linesDiff > 0) ? '+' : '') + this.coverageDiff.linesDiff.toFixed(2) + '%)\n';
+        heading += '```\n\n';
+        return heading;
+    }
+    linesCoverage() {
+        let linesCoverage = 'Lines coverage:\n```diff\n';
+        if (this.coverageDiff.linesDiff > 0) {
+            linesCoverage += '+ the line coverage has gone up by ' + this.coverageDiff.linesDiff.toFixed(2) + '%\n';
+            linesCoverage += '+ from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '%\n';
+        }
+        else if (this.coverageDiff.linesDiff === 0) {
+            linesCoverage += '! the lines coverage has stayed the same\n';
+            linesCoverage += '! the coverage is ' + this.coverage.linesCoverage + '%\n';
+        }
+        else {
+            linesCoverage += '- the line coverage has gone down by ' + this.coverageDiff.linesDiff.toFixed(2) + '%\n';
+            linesCoverage += '- from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '%\n';
+        }
+        linesCoverage += '```\n\n';
+        return linesCoverage;
+    }
+    methodCoverage() {
+        let methodCoverage = 'Method coverage:\n```diff\n';
+        if (this.coverageDiff.methodDiff > 0) {
+            methodCoverage += '+ the method coverage has gone up by ' + this.coverageDiff.methodDiff.toFixed(2) + '%\n';
+            methodCoverage += '+ from ' + this.headCoverage.methodCoverage.toFixed(2) + '% to ' + this.coverage.methodCoverage.toFixed(2) + '%\n';
+        }
+        else if (this.coverageDiff.methodDiff === 0) {
+            methodCoverage += '! the method coverage has stayed the same\n';
+            methodCoverage += '! the coverage is ' + this.coverage.methodCoverage + '%\n';
+        }
+        else {
+            methodCoverage += '- the method coverage has gone down by ' + this.coverageDiff.methodDiff.toFixed(2) + '%\n';
+            methodCoverage += '- from ' + this.headCoverage.methodCoverage.toFixed(2) + '% to ' + this.coverage.methodCoverage.toFixed(2) + '%\n';
+        }
+        methodCoverage += '```\n\n';
+        return methodCoverage;
+    }
+    classCoverage() {
+        let classCoverage = 'Class coverage:\n```diff\n';
+        if (this.coverageDiff.classDiff > 0) {
+            classCoverage += '+ the class coverage has gone up by ' + this.coverageDiff.classDiff.toFixed(2) + '%\n';
+            classCoverage += '+ from ' + this.headCoverage.classCoverage.toFixed(2) + '% to ' + this.coverage.classCoverage.toFixed(2) + '%\n';
+        }
+        else if (this.coverageDiff.classDiff === 0) {
+            classCoverage += '! the class coverage has stayed the same\n';
+            classCoverage += '! the coverage is ' + this.coverage.classCoverage + '%\n';
+        }
+        else {
+            classCoverage += '- the class coverage has gone down by ' + this.coverageDiff.classDiff.toFixed(2) + '%\n';
+            classCoverage += '- from ' + this.headCoverage.classCoverage.toFixed(2) + '% to ' + this.coverage.classCoverage.toFixed(2) + '%\n';
+        }
+        classCoverage += '```\n\n';
+        return classCoverage;
+    }
+}
+exports.CommentFormatter = CommentFormatter;
+
+
+/***/ }),
+
+/***/ 94320:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CommentWriter = void 0;
+const github_1 = __nccwpck_require__(95438);
+const CommentFormatter_1 = __nccwpck_require__(37945);
+class CommentWriter {
+    pullRequest;
+    token;
+    repo;
+    owner;
+    coverageDiff;
+    headCoverage;
+    coverage;
+    octokit;
+    commentFormatter;
+    constructor(pullRequest, token, repo, owner, coverageDiff, headCoverage, coverage) {
+        this.pullRequest = pullRequest;
+        this.token = token;
+        this.repo = repo;
+        this.owner = owner;
+        this.coverageDiff = coverageDiff;
+        this.headCoverage = headCoverage;
+        this.coverage = coverage;
+        this.octokit = (0, github_1.getOctokit)(this.token);
+        this.commentFormatter = new CommentFormatter_1.CommentFormatter(this.coverageDiff, this.headCoverage, this.coverage);
+    }
+    async write() {
+        const commentBody = this.commentFormatter.writeCommentBody();
+        const comments = await this.octokit.rest.issues.listComments({
+            owner: this.owner,
+            repo: this.repo,
+            issue_number: this.pullRequest,
+        });
+        for (const comment of Object.values(comments.data)) {
+            if (comment.body?.includes(CommentFormatter_1.CommentFormatter.CommentIdentifier)) {
+                await this.update(commentBody, comment.id);
+                return;
+            }
+        }
+        await this.create(commentBody);
+    }
+    async create(comment) {
+        await this.octokit.rest.issues.createComment({
+            owner: this.owner,
+            repo: this.repo,
+            issue_number: this.pullRequest,
+            body: comment,
+        });
+    }
+    async update(comment, commentId) {
+        await this.octokit.rest.issues.updateComment({
+            owner: this.owner,
+            repo: this.repo,
+            comment_id: commentId,
+            body: comment
+        });
+    }
+}
+exports.CommentWriter = CommentWriter;
+
+
+/***/ }),
+
+/***/ 16577:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CoverageReader = void 0;
+const CommentWriter_1 = __nccwpck_require__(94320);
+const Action_1 = __nccwpck_require__(55018);
+class CoverageReader {
+    config;
+    constructor(config) {
+        this.config = config;
+    }
+    async execute() {
+        const headCoverage = await this.config.storageAdapter.pullCoverage();
+        const coverage = this.config.loadCoverage();
+        const coverageDiff = {
+            linesDiff: coverage.linesCoverage - headCoverage.linesCoverage,
+            classDiff: coverage.classCoverage - headCoverage.classCoverage,
+            methodDiff: coverage.methodCoverage - headCoverage.methodCoverage,
+        };
+        const commentWriter = new CommentWriter_1.CommentWriter(this.config.pullRequest, this.config.token, this.config.repo, this.config.owner, coverageDiff, headCoverage, coverage);
+        await commentWriter.write();
+        return Action_1.ExecutionStatus.Success;
+    }
+}
+exports.CoverageReader = CoverageReader;
+
+
+/***/ }),
+
+/***/ 13998:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CoverageWriter = void 0;
+const Action_1 = __nccwpck_require__(55018);
+class CoverageWriter {
+    config;
+    constructor(config) {
+        this.config = config;
+    }
+    async execute() {
+        const coverage = this.config.loadCoverage();
+        try {
+            await this.config.storageAdapter.putCoverage({
+                linesCoverage: coverage.linesCoverage,
+                classCoverage: coverage.classCoverage,
+                methodCoverage: coverage.methodCoverage,
+            });
+        }
+        catch (err) {
+            return Action_1.ExecutionStatus.Failed;
+        }
+        return Action_1.ExecutionStatus.Success;
+    }
+}
+exports.CoverageWriter = CoverageWriter;
+
+
+/***/ }),
+
+/***/ 3089:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.AdapterFactory = void 0;
+const core_1 = __nccwpck_require__(42186);
+const DynamoDBAdapter_1 = __nccwpck_require__(55663);
+const JsonblobAdapter_1 = __nccwpck_require__(9830);
+class AdapterFactory {
+    static adapterMap = {
+        Jsonblob: JsonblobAdapter_1.JsonblobAdapter,
+        DynamoDB: DynamoDBAdapter_1.DynamoDBAdapter,
+    };
+    static createAdapter(adapterType) {
+        if (!this.isValidAdapterType(adapterType)) {
+            const error = new Error(`${adapterType} is not a valid adapter type, valid adapter types are Jsonblob and DynamoDB`);
+            (0, core_1.setFailed)(error);
+            throw error;
+        }
+        return new this.adapterMap[adapterType]();
+    }
+    static isValidAdapterType(adapterType) {
+        return ["DynamoDB", "Jsonblob"].includes(adapterType);
+    }
+}
+exports.AdapterFactory = AdapterFactory;
+
+
+/***/ }),
+
+/***/ 55663:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.DynamoDBAdapter = void 0;
+const core_1 = __nccwpck_require__(42186);
+const lib_dynamodb_1 = __nccwpck_require__(15219);
+const client_dynamodb_1 = __nccwpck_require__(23363);
+const credential_providers_1 = __nccwpck_require__(37464);
+class DynamoDBAdapter {
+    client = null;
+    async putCoverage(coverage) {
+        const documentClient = this.getDynamoDbDocumentClient();
+        await documentClient.send(new lib_dynamodb_1.UpdateCommand({
+            TableName: "coverage-storage",
+            Key: {
+                id: process.env.COVERAGE_STORAGE_ID
+            },
+            ExpressionAttributeNames: {
+                "#l": "linesCoverage",
+                "#m": "methodCoverage",
+                "#c": "classCoverage"
+            },
+            UpdateExpression: "set coverage.#l = :l, coverage.#m = :m, coverage.#c = :c",
+            ExpressionAttributeValues: {
+                ":l": coverage.linesCoverage,
+                ":m": coverage.methodCoverage,
+                ":c": coverage.classCoverage,
+            },
+        }));
+    }
+    async pullCoverage() {
+        const data = await this.getDynamoDbDocumentClient()
+            .send(new lib_dynamodb_1.GetCommand({
+            TableName: "coverage-storage",
+            Key: {
+                id: process.env.COVERAGE_STORAGE_ID
+            }
+        }));
+        if (!data.Item || !this.isCoverageType(data.Item?.coverage)) {
+            const error = new Error('The data from the DynamoDB response is invalid');
+            (0, core_1.setFailed)(error);
+            throw error;
+        }
+        const coverage = {
+            // @ts-ignore
+            linesCoverage: parseFloat(data.Item.coverage.linesCoverage),
+            // @ts-ignore
+            classCoverage: parseFloat(data.Item.coverage.classCoverage),
+            // @ts-ignore
+            methodCoverage: parseFloat(data.Item.coverage.methodCoverage),
+        };
+        return coverage;
+    }
+    isCoverageType = (commandOutput) => {
+        return ('linesCoverage' in commandOutput && 'classCoverage' in commandOutput && 'methodCoverage' in commandOutput);
+    };
+    getDynamoDbDocumentClient() {
+        if (this.client) {
+            return this.client;
+        }
+        return this.client = lib_dynamodb_1.DynamoDBDocumentClient.from(new client_dynamodb_1.DynamoDBClient({
+            credentials: (0, credential_providers_1.fromEnv)(),
+            region: process.env.AWS_REGION,
+        }));
+    }
+}
+exports.DynamoDBAdapter = DynamoDBAdapter;
+
+
+/***/ }),
+
+/***/ 9830:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.JsonblobAdapter = void 0;
+const axios_1 = __importDefault(__nccwpck_require__(88757));
+class JsonblobAdapter {
+    JSONBLOB_URL = 'https://jsonblob.com/api/';
+    async pullCoverage() {
+        return (await axios_1.default.get(this.JSONBLOB_URL + process.env.JSONBLOB_ID)).data;
+    }
+    async putCoverage(coverage) {
+        await axios_1.default.put(this.JSONBLOB_URL + process.env.JSONBLOB_ID, coverage);
+    }
+}
+exports.JsonblobAdapter = JsonblobAdapter;
+
+
+/***/ }),
+
 /***/ 87578:
 /***/ ((module) => {
 
@@ -54747,12 +54394,39 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
 /******/ 	
 /************************************************************************/
-/******/ 	
-/******/ 	// startup
-/******/ 	// Load entry module and return exports
-/******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __nccwpck_require__(19957);
-/******/ 	module.exports = __webpack_exports__;
-/******/ 	
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(() => {
+"use strict";
+var exports = __webpack_exports__;
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core_1 = __nccwpck_require__(42186);
+const ActionConfiguration_1 = __nccwpck_require__(95017);
+const Action_1 = __nccwpck_require__(55018);
+const CoverageReader_1 = __nccwpck_require__(16577);
+const CoverageWriter_1 = __nccwpck_require__(13998);
+const main = async () => {
+    const executionStatus = await run(ActionConfiguration_1.ActionConfiguration.loadConfiguration());
+    if (executionStatus === Action_1.ExecutionStatus.Failed) {
+        (0, core_1.setFailed)('The coverage actions have failed');
+        return;
+    }
+    (0, core_1.info)('The coverage actions have succeeded');
+    return;
+};
+async function run(config) {
+    if (config.actionType === "read") {
+        const coverageReader = new CoverageReader_1.CoverageReader(config);
+        return await coverageReader.execute();
+    }
+    const coverageWriter = new CoverageWriter_1.CoverageWriter(config);
+    return await coverageWriter.execute();
+}
+main();
+
+})();
+
+module.exports = __webpack_exports__;
 /******/ })()
 ;
