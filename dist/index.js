@@ -49891,78 +49891,32 @@ class CommentFormatter {
         this.coverage = coverage;
     }
     writeCommentBody() {
-        let comment = this.heading();
-        comment += '<details>\n<summary>Coverage Report:</summary>\n\n';
-        comment += this.linesCoverage();
-        comment += this.methodCoverage();
-        comment += this.classCoverage();
+        //heading
+        let comment = this.generateMarkdownDiff('lines');
+        comment += `\n`;
+        // summary
+        comment += `<details>\n<summary>Coverage Report:</summary>\n\n`;
+        for (const type of ['lines', 'method', 'class']) {
+            comment += `${type} coverage: \n`;
+            comment += this.generateMarkdownDiff(type);
+            comment += `\n`;
+        }
         comment += '</details>';
         return comment;
     }
-    heading() {
-        let heading = '```diff\n';
-        let headingStatus = '- ';
-        if (this.coverageDiff.linesDiff === 0) {
-            headingStatus = '! ';
-        }
-        else if (this.coverageDiff.linesDiff > 0) {
-            headingStatus = '+ ';
-        }
-        heading += headingStatus + ' lines: from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '% (' + ((this.coverageDiff.linesDiff > 0) ? '+' : '') + this.coverageDiff.linesDiff.toFixed(2) + '%)\n';
-        heading += '```\n\n';
-        return heading;
-    }
-    linesCoverage() {
-        let linesCoverage = 'Lines coverage:\n```diff\n';
-        if (this.coverageDiff.linesDiff > 0) {
-            linesCoverage += '+ the line coverage has gone up by ' + this.coverageDiff.linesDiff.toFixed(2) + '%\n';
-            linesCoverage += '+ from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '%\n';
-        }
-        else if (this.coverageDiff.linesDiff === 0) {
-            linesCoverage += '! the lines coverage has stayed the same\n';
-            linesCoverage += '! the coverage is ' + this.coverage.linesCoverage + '%\n';
-        }
-        else {
-            linesCoverage += '- the line coverage has gone down by ' + this.coverageDiff.linesDiff.toFixed(2) + '%\n';
-            linesCoverage += '- from ' + this.headCoverage.linesCoverage.toFixed(2) + '% to ' + this.coverage.linesCoverage.toFixed(2) + '%\n';
-        }
-        linesCoverage += '```\n\n';
-        return linesCoverage;
-    }
-    methodCoverage() {
-        let methodCoverage = 'Method coverage:\n```diff\n';
-        if (this.coverageDiff.methodDiff > 0) {
-            methodCoverage += '+ the method coverage has gone up by ' + this.coverageDiff.methodDiff.toFixed(2) + '%\n';
-            methodCoverage += '+ from ' + this.headCoverage.methodCoverage.toFixed(2) + '% to ' + this.coverage.methodCoverage.toFixed(2) + '%\n';
-        }
-        else if (this.coverageDiff.methodDiff === 0) {
-            methodCoverage += '! the method coverage has stayed the same\n';
-            methodCoverage += '! the coverage is ' + this.coverage.methodCoverage + '%\n';
-        }
-        else {
-            methodCoverage += '- the method coverage has gone down by ' + this.coverageDiff.methodDiff.toFixed(2) + '%\n';
-            methodCoverage += '- from ' + this.headCoverage.methodCoverage.toFixed(2) + '% to ' + this.coverage.methodCoverage.toFixed(2) + '%\n';
-        }
-        methodCoverage += '```\n\n';
-        return methodCoverage;
-    }
-    classCoverage() {
-        let classCoverage = 'Class coverage:\n```diff\n';
-        if (this.coverageDiff.classDiff > 0) {
-            classCoverage += '+ the class coverage has gone up by ' + this.coverageDiff.classDiff.toFixed(2) + '%\n';
-            classCoverage += '+ from ' + this.headCoverage.classCoverage.toFixed(2) + '% to ' + this.coverage.classCoverage.toFixed(2) + '%\n';
-        }
-        else if (this.coverageDiff.classDiff === 0) {
-            classCoverage += '! the class coverage has stayed the same\n';
-            classCoverage += '! the coverage is ' + this.coverage.classCoverage + '%\n';
-        }
-        else {
-            classCoverage += '- the class coverage has gone down by ' + this.coverageDiff.classDiff.toFixed(2) + '%\n';
-            classCoverage += '- from ' + this.headCoverage.classCoverage.toFixed(2) + '% to ' + this.coverage.classCoverage.toFixed(2) + '%\n';
-        }
-        classCoverage += '```\n\n';
-        return classCoverage;
-    }
+    generateMarkdownDiff = (type) => {
+        const [from, to, diff] = [
+            this.headCoverage[`${type}Coverage`],
+            this.coverage[`${type}Coverage`],
+            this.coverageDiff[`${type}Diff`],
+        ];
+        return `
+	\`\`\`diff
+	${diff > 0 ? `+ the ${type} coverage went up` : `- the ${type} coverage went down`}
+	${diff > 0 ? '+' : '-'} ${type}: from ${from.toFixed(2)}% to ${to.toFixed(2)}% (${diff.toFixed(2)}%)
+	\`\`\`
+	`;
+    };
 }
 exports.CommentFormatter = CommentFormatter;
 
@@ -50027,7 +49981,7 @@ class CommentWriter {
             owner: this.owner,
             repo: this.repo,
             comment_id: commentId,
-            body: comment
+            body: comment,
         });
     }
 }
@@ -50043,8 +49997,8 @@ exports.CommentWriter = CommentWriter;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CoverageReader = void 0;
-const CommentWriter_1 = __nccwpck_require__(94320);
 const Action_1 = __nccwpck_require__(55018);
+const CommentWriter_1 = __nccwpck_require__(94320);
 class CoverageReader {
     config;
     constructor(config) {
@@ -50058,6 +50012,11 @@ class CoverageReader {
             classDiff: coverage.classCoverage - headCoverage.classCoverage,
             methodDiff: coverage.methodCoverage - headCoverage.methodCoverage,
         };
+        if (coverageDiff.linesDiff === 0
+            && coverageDiff.classDiff === 0
+            && coverageDiff.methodDiff === 0) {
+            return Action_1.ExecutionStatus.Success;
+        }
         const commentWriter = new CommentWriter_1.CommentWriter(this.config.pullRequest, this.config.token, this.config.repo, this.config.owner, coverageDiff, headCoverage, coverage);
         await commentWriter.write();
         return Action_1.ExecutionStatus.Success;
@@ -50141,9 +50100,9 @@ exports.AdapterFactory = AdapterFactory;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DynamoDBAdapter = void 0;
 const core_1 = __nccwpck_require__(42186);
-const lib_dynamodb_1 = __nccwpck_require__(15219);
 const client_dynamodb_1 = __nccwpck_require__(23363);
 const credential_providers_1 = __nccwpck_require__(37464);
+const lib_dynamodb_1 = __nccwpck_require__(15219);
 class DynamoDBAdapter {
     client = null;
     async putCoverage(coverage) {
@@ -50151,12 +50110,12 @@ class DynamoDBAdapter {
         await documentClient.send(new lib_dynamodb_1.UpdateCommand({
             TableName: "coverage-storage",
             Key: {
-                id: process.env.COVERAGE_STORAGE_ID
+                id: process.env.COVERAGE_STORAGE_ID,
             },
             ExpressionAttributeNames: {
                 "#l": "linesCoverage",
                 "#m": "methodCoverage",
-                "#c": "classCoverage"
+                "#c": "classCoverage",
             },
             UpdateExpression: "set coverage.#l = :l, coverage.#m = :m, coverage.#c = :c",
             ExpressionAttributeValues: {
@@ -50167,12 +50126,11 @@ class DynamoDBAdapter {
         }));
     }
     async pullCoverage() {
-        const data = await this.getDynamoDbDocumentClient()
-            .send(new lib_dynamodb_1.GetCommand({
+        const data = await this.getDynamoDbDocumentClient().send(new lib_dynamodb_1.GetCommand({
             TableName: "coverage-storage",
             Key: {
-                id: process.env.COVERAGE_STORAGE_ID
-            }
+                id: process.env.COVERAGE_STORAGE_ID,
+            },
         }));
         if (!data.Item || !this.isCoverageType(data.Item?.coverage)) {
             const error = new Error('The data from the DynamoDB response is invalid');

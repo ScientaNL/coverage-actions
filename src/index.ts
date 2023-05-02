@@ -16,13 +16,13 @@ const main = async () => {
 
 	info('The coverage actions have succeeded');
 	return;
-}
+};
 
 async function run(config: ActionConfiguration): Promise<ExecutionStatus> {
 	if (config.actionType === "read") {
-	const coverageReader = new CoverageReader(config);
-	return await coverageReader.execute();
-}
+		const coverageReader = new CoverageReader(config);
+		return await coverageReader.execute();
+	}
 
 	const coverageWriter = new CoverageWriter(config);
 	return await coverageWriter.execute();
