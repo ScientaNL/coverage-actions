@@ -1,8 +1,8 @@
 import { setFailed } from "@actions/core";
-import { DynamoDBDocumentClient, GetCommand, GetCommandOutput, UpdateCommand } from "@aws-sdk/lib-dynamodb";
-import { Adapter, Coverage } from "./Adapter";
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { fromEnv } from "@aws-sdk/credential-providers";
+import { DynamoDBDocumentClient, GetCommand, GetCommandOutput, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { Adapter, Coverage } from "./Adapter";
 
 export class DynamoDBAdapter implements Adapter {
 	private client: DynamoDBDocumentClient | null = null;
@@ -14,12 +14,12 @@ export class DynamoDBAdapter implements Adapter {
 			new UpdateCommand({
 				TableName: "coverage-storage",
 				Key: {
-					id: process.env.COVERAGE_STORAGE_ID
+					id: process.env.COVERAGE_STORAGE_ID,
 				},
 				ExpressionAttributeNames: {
 					"#l": "linesCoverage",
 					"#m": "methodCoverage",
-					"#c": "classCoverage"
+					"#c": "classCoverage",
 				},
 				UpdateExpression: "set coverage.#l = :l, coverage.#m = :m, coverage.#c = :c",
 				ExpressionAttributeValues: {
@@ -32,16 +32,15 @@ export class DynamoDBAdapter implements Adapter {
 	}
 
 	public async pullCoverage(): Promise<Coverage> {
-		const data: GetCommandOutput = await this.getDynamoDbDocumentClient()
-			.send(
-				new GetCommand({
-						TableName: "coverage-storage",
-						Key: {
-							id: process.env.COVERAGE_STORAGE_ID
-						}
-					}
-				),
-			);
+		const data: GetCommandOutput = await this.getDynamoDbDocumentClient().send(
+			new GetCommand({
+					TableName: "coverage-storage",
+					Key: {
+						id: process.env.COVERAGE_STORAGE_ID,
+					},
+				},
+			),
+		);
 
 		if (!data.Item || !this.isCoverageType(data.Item?.coverage)) {
 			const error = new Error('The data from the DynamoDB response is invalid');
@@ -57,14 +56,14 @@ export class DynamoDBAdapter implements Adapter {
 			classCoverage: parseFloat(data.Item.coverage.classCoverage),
 			// @ts-ignore
 			methodCoverage: parseFloat(data.Item.coverage.methodCoverage),
-		}
+		};
 
 		return coverage;
 	}
 
 	private readonly isCoverageType = (commandOutput: object): commandOutput is Coverage => {
 		return ('linesCoverage' in commandOutput && 'classCoverage' in commandOutput && 'methodCoverage' in commandOutput);
-	}
+	};
 
 	private getDynamoDbDocumentClient(): DynamoDBDocumentClient {
 		if (this.client) {

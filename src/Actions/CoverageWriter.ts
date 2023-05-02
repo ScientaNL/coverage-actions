@@ -4,7 +4,7 @@ import { Action, ExecutionStatus } from "./Action";
 
 export class CoverageWriter implements Action {
 	public constructor(
-		private readonly config: ActionConfiguration
+		private readonly config: ActionConfiguration,
 	) {
 	}
 
@@ -23,5 +23,4 @@ export class CoverageWriter implements Action {
 
 		return ExecutionStatus.Success;
 	}
-
 }

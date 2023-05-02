@@ -1,11 +1,11 @@
 import { ActionConfiguration } from "../../config/ActionConfiguration";
 import { Coverage, CoverageDiff } from "../StorageAdapters/Adapter";
-import { CommentWriter } from "./CommentWriter";
 import { Action, ExecutionStatus } from "./Action";
+import { CommentWriter } from "./CommentWriter";
 
 export class CoverageReader implements Action {
 	public constructor(
-		private readonly config: ActionConfiguration
+		private readonly config: ActionConfiguration,
 	) {
 	}
 
@@ -17,6 +17,14 @@ export class CoverageReader implements Action {
 			linesDiff: coverage.linesCoverage - headCoverage.linesCoverage,
 			classDiff: coverage.classCoverage - headCoverage.classCoverage,
 			methodDiff: coverage.methodCoverage - headCoverage.methodCoverage,
+		};
+
+		if (
+			coverageDiff.linesDiff === 0
+			&& coverageDiff.classDiff === 0
+			&& coverageDiff.methodDiff === 0
+		) {
+			return ExecutionStatus.Success;
 		}
 
 		const commentWriter = new CommentWriter(
@@ -26,7 +34,7 @@ export class CoverageReader implements Action {
 			this.config.owner,
 			coverageDiff,
 			headCoverage,
-			coverage
+			coverage,
 		);
 
 		await commentWriter.write();

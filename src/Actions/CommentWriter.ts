@@ -50,7 +50,7 @@ export class CommentWriter {
 	}
 
 	private async create(
-		comment: string
+		comment: string,
 	): Promise<void> {
 		await this.octokit.rest.issues.createComment({
 			owner: this.owner,
@@ -68,7 +68,7 @@ export class CommentWriter {
 			owner: this.owner,
 			repo: this.repo,
 			comment_id: commentId,
-			body: comment
+			body: comment,
 		});
 	}
 }

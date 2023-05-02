@@ -9,7 +9,7 @@ export class AdapterFactory {
 	private static adapterMap = {
 		Jsonblob: JsonblobAdapter,
 		DynamoDB: DynamoDBAdapter,
-	}
+	};
 
 	public static createAdapter(adapterType: string): Adapter {
 		if (!this.isValidAdapterType(adapterType)) {
