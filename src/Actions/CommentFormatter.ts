@@ -37,10 +37,10 @@ export class CommentFormatter {
 			this.coverageDiff[`${type}Diff`],
 		];
 		return `
-	\`\`\`diff
-	${diff > 0 ? `+ the ${type} coverage went up` : `- the ${type} coverage went down`}
-	${diff > 0 ? '+' : '-'} ${type}: from ${from.toFixed(2)}% to ${to.toFixed(2)}% (${diff.toFixed(2)}%)
-	\`\`\`
+\`\`\`diff
+${diff > 0 ? `+ the ${type} coverage went up` : `- the ${type} coverage went down`}
+${diff > 0 ? '+' : '-'} ${type}: from ${from.toFixed(2)}% to ${to.toFixed(2)}% (${diff.toFixed(2)}%)
+\`\`\`
 	`;
 	};
 }
